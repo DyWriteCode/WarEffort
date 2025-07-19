@@ -136,6 +136,15 @@ public class Machine
         switch (machineInfo.executionType)
         {
             case ExecutionType.Converter:
+                foreach (ItemUI item in machineInfo.itemsThatProduces)
+                {
+                    if (!storedItems.ContainsKey(item.type))
+                    {
+                        storedItems.Add(item.type, 0);
+                    }
+                    storedItems[item.type] += item.quantity;
+                }
+                break;
             case ExecutionType.Generator:
                 foreach (ItemUI item in machineInfo.itemsThatProduces)
                 {

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace Peque.Machines
@@ -69,31 +68,63 @@ namespace Peque.Machines
             if (itemPositions.ContainsKey(4))
             {
                 Item.Type itemType = items[itemPositions[4]];
-                bool itemMoved = false;
-
-                foreach (var connection in connections)
+                foreach (KeyValuePair<Vector3, ConnectionType> connection in connections)
                 {
-                    if (connection.Value == ConnectionType.Input) continue;
+                    if (connection.Value == ConnectionType.Input)
+                    {
+                        continue;
+                    }
 
                     Machine neighborMachine = GameGrid.Instance.getMachineAt(connection.Key);
-                    if (neighborMachine == null) continue;
 
-                    // === 新增：熔炼厂专用处理 ===
-                    if (neighborMachine.type == Machine.Type.IronFoundry)
+                    if (neighborMachine.type == Type.Belt)
                     {
-                        // 只接收铁矿
-                        if (itemType == Item.Type.IronOre && neighborMachine.canStoreItem(itemType))
+                        Belt belt = (Belt)neighborMachine;
+                        if (belt.hasFreeSlots)
                         {
-                            itemMoved = true;
+                            try
+                            {
+                                belt.addToItems(itemPositions[4], itemType);
+
+                                // unlink from this belt
+                                items.Remove(itemPositions[4]);
+                                itemPositions.Remove(4);
+                            }
+                            catch { }
                             break;
                         }
                     }
-                }
+                    else
+                    {
+                        // check if item can be stored in that machine
+                        if (!neighborMachine.info.storageLimits.ContainsKey(itemType) || !neighborMachine.canStoreItem(itemType))
+                        {
+                            continue;
+                        }
 
-                // === 新增：末端无连接处理 ===
-                if (!itemMoved && connections.All(c => c.Value == ConnectionType.Input))
-                {
-                    // 销毁物品
+                        if (!neighborMachine.storedItems.ContainsKey(itemType))
+                        {
+                            neighborMachine.storedItems.Add(itemType, 0);
+                        }
+                        neighborMachine.storedItems[itemType]++;
+
+                        System.Guid itemId = itemPositions[4];
+                        if (GameGrid.Instance.items.TryGetValue(itemId, out Item item))
+                        {
+                            // 销毁游戏对象
+                            if (item.transform != null)
+                            {
+                                GameObject.Destroy(item.transform.gameObject);
+                            }
+                            // 移除全局引用
+                            GameGrid.Instance.items.Remove(itemId);
+                        }
+
+                        // unlink from this belt
+                        items.Remove(itemPositions[4]);
+                        //GameGrid.Destroy(itemPositions[4].gameObject);
+                        itemPositions.Remove(4);
+                    }
                 }
             }
 

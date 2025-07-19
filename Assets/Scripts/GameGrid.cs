@@ -68,10 +68,17 @@ namespace Peque {
 
         private void moveItems() {
             while (itemsToMove.Any()) {
-                System.Guid id = itemsToMove.Dequeue();
-                Item item = items[id];
-                item.transform.parent = getMachineAt(item.parent).gameObject.transform;
-                item.transform.localPosition = item.position;
+                try
+                {
+                    System.Guid id = itemsToMove.Dequeue();
+                    Item item = items[id];
+                    item.transform.parent = getMachineAt(item.parent).gameObject.transform;
+                    item.transform.localPosition = item.position;
+                }
+                catch
+                {
+                    Debug.LogWarning("err");
+                }
             }
         }
 
