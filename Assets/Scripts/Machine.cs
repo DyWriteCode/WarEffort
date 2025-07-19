@@ -102,38 +102,45 @@ public class Machine
     protected virtual void onUpdateConnection(Vector3 neighbor) {
     }
 
-    public virtual void run () {
+    public virtual void run()
+    {
         ticksUntilNextExecution--;
 
-        if (ticksUntilNextExecution > 0) {
+        if (ticksUntilNextExecution > 0)
+        {
             return;
         }
-        
+
         MachineInfo machineInfo = GameGrid.Instance.getMachineInfo(type);
 
         // reset timer
         ticksUntilNextExecution = machineInfo.ticksBetweenExecution;
 
-        if (machineInfo.executionType != ExecutionType.Seller) {
-            Debug.Log("2");
+        if (machineInfo.executionType != ExecutionType.Seller)
+        {
             sendItemsToConveyorBelt(machineInfo);
         }
-        
-        if (!hasRequiredItemsToProduce(machineInfo)) {
+
+        if (!hasRequiredItemsToProduce(machineInfo))
+        {
             return;
         }
 
-        if (machineInfo.executionType != ExecutionType.Seller && !canStoreProducedItems(machineInfo)) {
+        if (machineInfo.executionType != ExecutionType.Seller && !canStoreProducedItems(machineInfo))
+        {
             return;
         }
 
         deductItemsToProduce(machineInfo);
 
-        switch (machineInfo.executionType) {
+        switch (machineInfo.executionType)
+        {
             case ExecutionType.Converter:
             case ExecutionType.Generator:
-                foreach (ItemUI item in machineInfo.itemsThatProduces) {
-                    if (!storedItems.ContainsKey(item.type)) {
+                foreach (ItemUI item in machineInfo.itemsThatProduces)
+                {
+                    if (!storedItems.ContainsKey(item.type))
+                    {
                         storedItems.Add(item.type, 0);
                     }
                     storedItems[item.type] += item.quantity;
@@ -161,57 +168,63 @@ public class Machine
                 }
                 break;
         }
-
-        if (info.executionType == ExecutionType.Converter)
-        {
-            sendItemsToConveyorBelt(info);
-        }
     }
 
-    private void sendItemsToConveyorBelt (MachineInfo machineInfo) {
+
+    private void sendItemsToConveyorBelt(MachineInfo machineInfo)
+    {
         bool hasItemsToSend = false;
 
-        foreach (ItemUI item in machineInfo.itemsThatProduces) {
-            if (storedItems.ContainsKey(item.type) && storedItems[item.type] > 0) {
+        foreach (ItemUI item in machineInfo.itemsThatProduces)
+        {
+            if (storedItems.ContainsKey(item.type) && storedItems[item.type] > 0)
+            {
                 hasItemsToSend = true;
                 break;
             }
-            storedItems[item.type] = storedItems.GetValueOrDefault(item.type, 0) + item.quantity;
         }
 
-        if (!hasItemsToSend) {
+        if (!hasItemsToSend)
+        {
             return;
         }
 
         // know how many output connections has to divide the output between
         int outputConnections = 0;
 
-        foreach (KeyValuePair<Vector3, ConnectionType> connection in connections) {
-            if (connection.Value == ConnectionType.Output && ((Belt)GameGrid.Instance.getMachineAt(connection.Key)).hasFreeSlots) {
+        foreach (KeyValuePair<Vector3, ConnectionType> connection in connections)
+        {
+            if (connection.Value == ConnectionType.Output && ((Belt)GameGrid.Instance.getMachineAt(connection.Key)).hasFreeSlots)
+            {
                 outputConnections++;
             }
         }
 
-        if (outputConnections < 1) {
-            Debug.Log("outputConnections");
+        if (outputConnections < 1)
+        {
             return;
         }
 
         // TEMPORAL
         storedItems[machineInfo.itemsThatProduces.First().type]--;
 
-        foreach (KeyValuePair<Vector3, ConnectionType> connection in connections) {
+        foreach (KeyValuePair<Vector3, ConnectionType> connection in connections)
+        {
             Belt belt = (Belt)GameGrid.Instance.getMachineAt(connection.Key);
-            if (connection.Value == ConnectionType.Output && belt.hasFreeSlots) {
+            if (connection.Value == ConnectionType.Output && belt.hasFreeSlots)
+            {
                 belt.addItem(machineInfo.itemsThatProduces.First().type);
                 break;
             }
         }
     }
 
-    private bool hasRequiredItemsToProduce (MachineInfo machineInfo) {
-        foreach (ItemUI item in machineInfo.requiredItemsToProduce) {
-            if (!storedItems.ContainsKey(item.type) || storedItems[item.type] < item.quantity) {
+    private bool hasRequiredItemsToProduce(MachineInfo machineInfo)
+    {
+        foreach (ItemUI item in machineInfo.requiredItemsToProduce)
+        {
+            if (!storedItems.ContainsKey(item.type) || storedItems[item.type] < item.quantity)
+            {
                 return false;
             }
         }
