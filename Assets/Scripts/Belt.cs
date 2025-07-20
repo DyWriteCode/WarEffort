@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 namespace Peque.Machines
 {
@@ -60,6 +61,12 @@ namespace Peque.Machines
             GameGrid.Instance.items[item].parent = position;
             GameGrid.Instance.items[item].position = positions[1];
             GameGrid.Instance.itemsToMove.Enqueue(item);
+
+            if (GameGrid.Instance.items[item].healthBar)
+            {
+                Transform transform = GameGrid.Instance.items[item].transform;
+                GameGrid.Instance.items[item].healthBar.GetComponent<HealthBar>().target = transform;
+            }
         }
 
         public override void run()
@@ -115,6 +122,7 @@ namespace Peque.Machines
                             if (item.transform != null)
                             {
                                 GameObject.Destroy(item.transform.gameObject);
+                                GameObject.Destroy(item.healthBar);
                             }
                             // 移除全局引用
                             GameGrid.Instance.items.Remove(itemId);

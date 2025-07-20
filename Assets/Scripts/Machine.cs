@@ -168,6 +168,7 @@ public class Machine
                             if (GameGrid.Instance.items.TryGetValue(itemId, out Item item))
                             {
                                 GameObject.Destroy(item.transform.gameObject);
+                                GameObject.Destroy(item.healthBar);
                                 GameGrid.Instance.items.Remove(itemId);
                             }
                             inputBelt.items.Remove(itemId);
@@ -258,6 +259,10 @@ public class Machine
                         if (GameGrid.Instance.items.TryGetValue(itemId, out Item itemObj))
                         {
                             GameObject.Destroy(itemObj.transform.gameObject);
+                            if (itemObj.healthBar)
+                            {
+                                GameObject.Destroy(itemObj.healthBar);
+                            }
                             GameGrid.Instance.items.Remove(itemId);
                         }
                         inputBelt.items.Remove(itemId);

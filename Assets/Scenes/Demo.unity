@@ -1919,6 +1919,8 @@ MonoBehaviour:
   floorTile: {fileID: 8779731098260577229, guid: a0e987d1d4fe9fc4d85c28ea2d6d4da7,
     type: 3}
   money: 10000
+  healthBarPrefab: {fileID: 1877534019383751243, guid: b2b003b99683f1a4a9f120877669f0e0,
+    type: 3}
   size: 1
 --- !u!4 &1074229867
 Transform:

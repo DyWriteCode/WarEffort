@@ -29,6 +29,8 @@ namespace Peque {
 
         public int money = 10000;
 
+        public GameObject healthBarPrefab;
+
         private float moveTextureSpeed = 1;
         private int ticksPerSecond = 6;
         float moveX;
@@ -63,22 +65,23 @@ namespace Peque {
                 Item item = items[id];
                 GameObject obj = Instantiate(item.info.prefab, item.position, Quaternion.Euler(-90, 0, 0), getMachineAt(item.parent).gameObject.transform);
                 item.transform = obj.transform;
+
+                // 创建血条
+                if (healthBarPrefab)
+                {
+                    GameObject healthBar = Instantiate(healthBarPrefab, obj.transform.position + new Vector3(0, 1.5f, 0), Quaternion.identity);
+                    healthBar.GetComponent<HealthBar>().target = obj.transform;
+                    item.healthBar = healthBar;
+                }
             }
         }
 
         private void moveItems() {
             while (itemsToMove.Any()) {
-                try
-                {
-                    System.Guid id = itemsToMove.Dequeue();
-                    Item item = items[id];
-                    item.transform.parent = getMachineAt(item.parent).gameObject.transform;
-                    item.transform.localPosition = item.position;
-                }
-                catch
-                {
-                    Debug.LogWarning("err");
-                }
+                System.Guid id = itemsToMove.Dequeue();
+                Item item = items[id];
+                item.transform.parent = getMachineAt(item.parent).gameObject.transform;
+                item.transform.localPosition = item.position;
             }
         }
 
@@ -255,6 +258,7 @@ namespace Peque {
                 if (item.transform != null)
                 {
                     Destroy(item.transform.gameObject);
+                    Destroy(item.healthBar);
                 }
                 items.Remove(item.id);
             }
