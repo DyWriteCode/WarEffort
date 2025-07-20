@@ -24,7 +24,7 @@ namespace Peque
 
         public ItemInfo info {
             get {
-                return GameGrid.Instance.getItemInfo(type);
+                return GameGrid.Instance.GetItemInfo(type);
             }
         }
 

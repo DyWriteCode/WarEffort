@@ -1303,8 +1303,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spacePreviewer: {fileID: 862041958}
-  canBuildMat: {fileID: 2100000, guid: 8d7f264cf110b5d42a0fa8b0652153fb, type: 2}
-  cannotBuildMat: {fileID: 2100000, guid: 96d5d701769c1e946b2df96eac32d26d, type: 2}
+  canBuildMat: {fileID: 0}
+  cannotBuildMat: {fileID: 0}
 --- !u!114 &679566297
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1823,6 +1823,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1ab639196a241c4a85051f829b1e550, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gridSize: 1
+  floorTilePrefab: {fileID: 0}
+  beltMaterial: {fileID: 2100000, guid: 96f720de15132c146930cd4919bf26df, type: 2}
+  beltMoveSpeed: 1
+  initialMoney: 10000
+  ticksPerSecond: 6
   machinesInfo:
   - type: 1
     executionType: 0
@@ -1915,13 +1921,9 @@ MonoBehaviour:
     prefab: {fileID: 2173143582795021995, guid: 0e21332a1f0ea0d48a4ecbb1e8a50f8a,
       type: 3}
     type: 3
-  beltMaterial: {fileID: 2100000, guid: 96f720de15132c146930cd4919bf26df, type: 2}
-  floorTile: {fileID: 8779731098260577229, guid: a0e987d1d4fe9fc4d85c28ea2d6d4da7,
-    type: 3}
-  money: 10000
   healthBarPrefab: {fileID: 1877534019383751243, guid: b2b003b99683f1a4a9f120877669f0e0,
     type: 3}
-  size: 1
+  money: 10000
 --- !u!4 &1074229867
 Transform:
   m_ObjectHideFlags: 0

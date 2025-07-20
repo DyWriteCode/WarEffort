@@ -6,10 +6,10 @@ public class BuildPanelButton : MonoBehaviour, IPointerEnterHandler, IPointerCli
     public Machine.Type type;
 
     public void OnPointerClick(PointerEventData eventData) {
-        BuildPanel.Instance.select(type);
+        BuildPanel.Instance.SelectMachine(type);
     }
 
     public void OnPointerEnter(PointerEventData eventData) {
-        BuildPanel.Instance.showMachineInfo(type);
+        BuildPanel.Instance.ShowMachineInfo(type);
     }
 }

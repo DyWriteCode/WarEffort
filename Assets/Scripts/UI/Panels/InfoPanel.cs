@@ -38,7 +38,7 @@ public class InfoPanel : MonoBehaviour
 
         Vector3 gridPosition = GameGrid.Instance.GetNearestPointOnGrid(hitInfo.point);
 
-        if (GameGrid.Instance.isAvailable(gridPosition)) {
+        if (GameGrid.Instance.IsPositionAvailable(gridPosition)) {
             return;
         }
 
@@ -47,7 +47,7 @@ public class InfoPanel : MonoBehaviour
             InvokeRepeating("updateShownInfo", 0, 1);
         }
 
-        selectedMachine = GameGrid.Instance.getMachineAt(gridPosition);
+        selectedMachine = GameGrid.Instance.GetMachineAt(gridPosition);
         setSelectedMachine(selectedMachine.info);
     }
 
