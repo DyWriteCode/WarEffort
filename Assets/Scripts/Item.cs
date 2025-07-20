@@ -27,5 +27,32 @@ namespace Peque
                 return GameGrid.Instance.getItemInfo(type);
             }
         }
+
+        public void DestroyHealthBar()
+        {
+            if (healthBar != null)
+            {
+                // 安全销毁血条
+                GameObject.Destroy(healthBar);
+                healthBar = null;
+            }
+        }
+
+        public void ShowHealthBar()
+        {
+            if (healthBar != null)
+            {
+                healthBar.SetActive(true);
+            }
+        }
+
+        public void HideHealthBar()
+        {
+            if (healthBar != null)
+            {
+                healthBar.SetActive(false);
+            }
+        }
     }
+
 }

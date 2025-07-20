@@ -118,14 +118,30 @@ namespace Peque.Machines
                         System.Guid itemId = itemPositions[4];
                         if (GameGrid.Instance.items.TryGetValue(itemId, out Item item))
                         {
-                            // 销毁游戏对象
-                            if (item.transform != null)
+                            // 在销毁物品的地方添加以下逻辑
+                            if (GameGrid.Instance.itemsToMove.Contains(itemId))
+                            {
+                                // 创建临时队列，移除待移动物品
+                                Queue<System.Guid> newQueue = new Queue<System.Guid>();
+                                while (GameGrid.Instance.itemsToMove.Count > 0)
+                                {
+                                    System.Guid currentId = GameGrid.Instance.itemsToMove.Dequeue();
+                                    if (currentId != itemId)
+                                    {
+                                        newQueue.Enqueue(currentId);
+                                    }
+                                }
+                                GameGrid.Instance.itemsToMove = newQueue;
+                            }
+                            GameGrid.Instance.SafeRemoveItemFromQueues(itemId);
+
+                            // 然后销毁物品
+                            if (GameGrid.Instance.items.TryGetValue(itemId, out item))
                             {
                                 GameObject.Destroy(item.transform.gameObject);
-                                GameObject.Destroy(item.healthBar);
+                                item.DestroyHealthBar();
+                                GameGrid.Instance.items.Remove(itemId);
                             }
-                            // 移除全局引用
-                            GameGrid.Instance.items.Remove(itemId);
                         }
 
                         // unlink from this belt

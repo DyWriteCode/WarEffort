@@ -258,12 +258,32 @@ public class Machine
                         Guid itemId = itemEntry.Key;
                         if (GameGrid.Instance.items.TryGetValue(itemId, out Item itemObj))
                         {
-                            GameObject.Destroy(itemObj.transform.gameObject);
-                            if (itemObj.healthBar)
+                            // 在销毁物品的地方添加以下逻辑
+                            if (GameGrid.Instance.itemsToMove.Contains(itemId))
                             {
-                                GameObject.Destroy(itemObj.healthBar);
+                                // 创建临时队列，移除待移动物品
+                                Queue<System.Guid> newQueue = new Queue<System.Guid>();
+                                while (GameGrid.Instance.itemsToMove.Count > 0)
+                                {
+                                    System.Guid currentId = GameGrid.Instance.itemsToMove.Dequeue();
+                                    if (currentId != itemId)
+                                    {
+                                        newQueue.Enqueue(currentId);
+                                    }
+                                }
+                                GameGrid.Instance.itemsToMove = newQueue;
                             }
-                            GameGrid.Instance.items.Remove(itemId);
+                            GameGrid.Instance.SafeRemoveItemFromQueues(itemId);
+
+                            Item item_obj = null;
+
+                            // 然后销毁物品
+                            if (GameGrid.Instance.items.TryGetValue(itemId, out item_obj))
+                            {
+                                GameObject.Destroy(item_obj.transform.gameObject);
+                                item_obj.DestroyHealthBar();
+                                GameGrid.Instance.items.Remove(itemId);
+                            }
                         }
                         inputBelt.items.Remove(itemId);
                         // 同时从位置字典移除

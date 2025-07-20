@@ -29,6 +29,7 @@ namespace Peque {
 
         public int money = 10000;
 
+        private HealthBarManager healthBarManager;
         public GameObject healthBarPrefab;
 
         private float moveTextureSpeed = 1;
@@ -42,6 +43,9 @@ namespace Peque {
             Instance = this;
 
             processMachineInfo();
+
+            healthBarManager = gameObject.AddComponent<HealthBarManager>();
+            healthBarManager.healthBarPrefab = healthBarPrefab;
         }
 
         private void Start() {
@@ -69,19 +73,56 @@ namespace Peque {
                 // 创建血条
                 if (healthBarPrefab)
                 {
-                    GameObject healthBar = Instantiate(healthBarPrefab, obj.transform.position + new Vector3(0, 1.5f, 0), Quaternion.identity);
-                    healthBar.GetComponent<HealthBar>().target = obj.transform;
-                    item.healthBar = healthBar;
+                    healthBarManager.CreateHealthBarForItem(item, obj.transform);
                 }
             }
         }
 
-        private void moveItems() {
-            while (itemsToMove.Any()) {
+        //private void moveItems() {
+        //    while (itemsToMove.Any()) {
+        //        System.Guid id = itemsToMove.Dequeue();
+        //        Item item = items[id];
+        //        item.transform.parent = getMachineAt(item.parent).gameObject.transform;
+        //        item.transform.localPosition = item.position;
+        //    }
+        //}
+
+        private void moveItems()
+        {
+            while (itemsToMove.Count > 0)
+            {
                 System.Guid id = itemsToMove.Dequeue();
+
+                // 多重安全检查
+                if (!items.ContainsKey(id)) continue; // 物品已被移除
+                if (items[id] == null) continue; // 物品引用已释放
+                if (items[id].transform == null) continue; // transform已销毁
+
                 Item item = items[id];
-                item.transform.parent = getMachineAt(item.parent).gameObject.transform;
-                item.transform.localPosition = item.position;
+
+                // 检查父机器是否有效
+                if (!grid.ContainsKey(item.parent)) continue;
+                Vector3 machinePosition = grid[item.parent];
+                if (!machines.ContainsKey(machinePosition)) continue;
+
+                Machine parentMachine = machines[machinePosition];
+                if (parentMachine == null || parentMachine.gameObject == null) continue;
+
+                try
+                {
+                    // 安全设置父对象和位置
+                    item.transform.parent = parentMachine.gameObject.transform;
+                    item.transform.localPosition = item.position;
+                }
+                catch (System.NullReferenceException)
+                {
+                    // 捕获可能的空引用异常
+                    Debug.LogWarning($"移动物品时发生空引用: {id}");
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogError($"移动物品时出错: {id} - {e.Message}");
+                }
             }
         }
 
@@ -286,6 +327,39 @@ namespace Peque {
             machines.Clear();
             grid.Clear();
             items.Clear();
+        }
+
+        public void SafeRemoveItemFromQueues(System.Guid itemId)
+        {
+            // 从创建队列中移除
+            if (itemsToCreate.Contains(itemId))
+            {
+                Queue<System.Guid> newCreateQueue = new Queue<System.Guid>();
+                while (itemsToCreate.Count > 0)
+                {
+                    System.Guid currentId = itemsToCreate.Dequeue();
+                    if (currentId != itemId)
+                    {
+                        newCreateQueue.Enqueue(currentId);
+                    }
+                }
+                itemsToCreate = newCreateQueue;
+            }
+
+            // 从移动队列中移除
+            if (itemsToMove.Contains(itemId))
+            {
+                Queue<System.Guid> newMoveQueue = new Queue<System.Guid>();
+                while (itemsToMove.Count > 0)
+                {
+                    System.Guid currentId = itemsToMove.Dequeue();
+                    if (currentId != itemId)
+                    {
+                        newMoveQueue.Enqueue(currentId);
+                    }
+                }
+                itemsToMove = newMoveQueue;
+            }
         }
     }
 }
