@@ -528,6 +528,10 @@ namespace Peque
             {
                 healthBarManager.CreateHealthBarForItem(item, obj.transform);
             }
+
+            // 添加物品碰撞组件
+            ItemObject itemObject = obj.AddComponent<ItemObject>();
+            itemObject.item = item;
         }
 
         /// <summary>
@@ -688,6 +692,10 @@ namespace Peque
             if (!IsPositionAvailable(machine.position) || machine.info.price > money)
             {
                 Debug.LogWarning($"无法放置机器: 位置占用或资金不足");
+                if (machine.gameObject != null)
+                {
+                    Destroy(machine.gameObject);
+                }
                 return;
             }
 
@@ -836,22 +844,6 @@ namespace Peque
         #endregion
 
         #region Debug and UI
-        void OnGUI()
-        {
-            GUILayout.Label($"待创建物品: {itemsToCreate.Count}");
-            GUILayout.Label($"待移动物品: {itemsToMove.Count}");
-            GUILayout.Label($"当前资金: {money}$");
-
-            foreach (var machine in machines.Values)
-            {
-                if (machine.storedItems.Count > 0)
-                {
-                    string items = string.Join(",",
-                        machine.storedItems.Select(kv => $"{kv.Key}:{kv.Value}"));
-                    GUILayout.Label($"{machine.type} 库存: {items}");
-                }
-            }
-        }
         #endregion
     }
 }

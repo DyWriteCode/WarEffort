@@ -100,6 +100,13 @@ public class BuildPanel : MonoBehaviour
     }
 
     private void placeMachine (Vector3 clickPoint) {
+
+        if (!CanAffordMachine())
+        {
+            Debug.LogWarning($"资金不足! 需要 {selectedMachine.price}$");
+            return;
+        }
+
         Vector3 gridPosition = GameGrid.Instance.GetNearestPointOnGrid(clickPoint);
 
         // machines may take multiple blocks, so we need to make sure all are available
@@ -113,11 +120,31 @@ public class BuildPanel : MonoBehaviour
 
         GameObject obj = Instantiate(selectedMachine.prefab, getPlacingPosition(gridPosition), Quaternion.identity);
         obj.name = gridPosition.ToString();
-        Machine machine = new Machine(obj, selectedMachine.type, gridPosition);
+        Machine machine;
+        // 根据类型创建不同的机器实例
+        if (selectedMachine.type == Machine.Type.AttackMachine)
+        {
+            machine = new AttackMachine(obj);
+        }
+        else if (selectedMachine.type == Machine.Type.Belt)
+        {
+            machine = new Belt(obj);
+        }
+        else
+        {
+            machine = new Machine(obj, selectedMachine.type, gridPosition);
+        }
         GameGrid.Instance.PlaceMachine(machine);
     }
 
     private void placeBelt(Vector3 clickPoint) {
+
+        if (!CanAffordMachine())
+        {
+            Debug.LogWarning($"资金不足! 需要 {selectedMachine.price}$");
+            return;
+        }
+
         Vector3 finalPosition = GameGrid.Instance.GetNearestPointOnGrid(clickPoint);
 
         // avoid overlapping
@@ -238,4 +265,11 @@ public class BuildPanel : MonoBehaviour
         spacePreviewer.gameObject.SetActive(true);
         spacePreviewer.localScale = new Vector3(selectedMachine.x, 1, selectedMachine.y);
     }
+
+    private bool CanAffordMachine()
+    {
+        return selectedMachine != null &&
+               GameGrid.Instance.money >= selectedMachine.price;
+    }
+
 }

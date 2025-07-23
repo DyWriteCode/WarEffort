@@ -21,6 +21,11 @@ public class MachineInfo
     public Dictionary<Item.Type, int> storageLimits = new Dictionary<Item.Type, int>();
     public int moneyThatGenerates = 0;
     public int price = 100;
+
+    [Header("Damage Zone Settings")]
+    public float damageRange = 5f;
+    public int damageInterval = 10;
+    public int damagePerTick = 10;
 }
 [Serializable]
 public class ItemUI

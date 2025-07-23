@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Net;
 using UnityEngine;
 
 namespace Peque
@@ -18,7 +19,8 @@ namespace Peque
         public Vector3 position;
         public Type type;
         public Transform transform;
-        public int hp = 100; // 初始血量
+        private int hp = 100; // 初始血量
+        
         public int maxHp = 100;
         public GameObject healthBar; // 关联的血条对象
 
@@ -26,6 +28,16 @@ namespace Peque
             get {
                 return GameGrid.Instance.GetItemInfo(type);
             }
+        }
+
+        public int Hp { get => hp; set {
+                hp = value;
+                if (healthBar != null)
+                {
+                    Debug.Log("healthBar.GetComponent<HealthBar>().SetHealth(hp);");
+                    healthBar.GetComponent<HealthBar>().SetHealth(hp);
+                }
+            }  
         }
 
         public void DestroyHealthBar()

@@ -31,9 +31,6 @@ public class HealthBarManager : MonoBehaviour
             controller.Initialize(item, target);
         }
 
-        // test
-        controller.SetHealth(Random.Range(0, 100));
-
         // 关联到物品
         item.healthBar = healthBar;
     }

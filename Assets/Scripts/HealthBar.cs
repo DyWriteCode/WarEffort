@@ -37,7 +37,7 @@ public class HealthBar : MonoBehaviour
         if (healthSlider == null) return;
 
         // 更新血量值
-        item.hp = currentHp;
+        item.Hp = currentHp;
 
         // 如果需要更新最大血量
         if (maxHp > 0)
@@ -58,7 +58,7 @@ public class HealthBar : MonoBehaviour
         if (healthSlider == null) return;
 
         // 获取血量的百分比
-        float healthPercentage = (float)item.hp / item.maxHp;
+        float healthPercentage = (float)item.Hp / item.maxHp;
 
         // 根据血量比例改变颜色
         healthSlider.fillRect.TryGetComponent<Image>(out Image fillImage);
@@ -84,7 +84,7 @@ public class HealthBar : MonoBehaviour
     {
         if (healthSlider != null)
         {
-            healthSlider.value = item.hp;
+            healthSlider.value = item.Hp;
             healthSlider.maxValue = item.maxHp;
             UpdateHealthColor();
         }

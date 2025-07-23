@@ -357,6 +357,7 @@ public class Machine
         IronOreBroker = 2,
         IronFoundry = 3,
         IronSeller = 4,
+        AttackMachine = 5,
     }
 
     /// <summary>
@@ -367,6 +368,7 @@ public class Machine
         Generator = 1,
         Converter = 2,
         Seller = 3,
+        Building = 4,
     }
 
     /// <summary>
