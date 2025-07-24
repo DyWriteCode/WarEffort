@@ -36,11 +36,6 @@ namespace Peque
 
         public int Hp { get => hp; set {
                 hp = value;
-                if (healthBar != null)
-                {
-                    Debug.Log("healthBar.GetComponent<HealthBar>().SetHealth(hp);");
-                    // healthBar.GetComponent<HealthBar>().SetHealth(hp);
-                }
             }  
         }
 
@@ -61,22 +56,6 @@ namespace Peque
                 // 安全销毁血条
                 GameObject.Destroy(healthBar);
                 healthBar = null;
-            }
-        }
-
-        public void ShowHealthBar()
-        {
-            if (healthBar != null)
-            {
-                healthBar.SetActive(true);
-            }
-        }
-
-        public void HideHealthBar()
-        {
-            if (healthBar != null)
-            {
-                healthBar.SetActive(false);
             }
         }
 
