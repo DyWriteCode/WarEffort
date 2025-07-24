@@ -796,6 +796,7 @@ namespace Peque
 
             // 销毁血条
             item.DestroyHealthBar();
+            item.Destroy();
 
             // 从全局系统移除
             items.Remove(itemId);

@@ -466,7 +466,8 @@ namespace Peque.Machines
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"传送物品到传送带失败: {e.Message}");
+                Debug.LogError(e.Message);
+                Debug.LogWarning($"传送物品到传送带失败: {e.Message}");
                 return false;
             }
         }

@@ -5,6 +5,7 @@ namespace Peque.Machines
     public class AttackMachineVisualizer : MonoBehaviour
     {
         private AttackMachineController controller;
+        private Material rangeMaterial;
 
         public void Initialize(AttackMachineController controller)
         {
@@ -19,12 +20,21 @@ namespace Peque.Machines
             rangeVisualizer.transform.localPosition = Vector3.zero;
             rangeVisualizer.transform.localScale = Vector3.one * controller.damageRange * 2;
 
-            var renderer = rangeVisualizer.GetComponent<Renderer>();
-            renderer.material = new Material(Shader.Find("Transparent/Diffuse"))
+            rangeMaterial = new Material(Shader.Find("Transparent/Diffuse"))
             {
                 color = new Color(1, 0, 0, 0.2f)
             };
+            var renderer = rangeVisualizer.GetComponent<Renderer>();
+            renderer.material = rangeMaterial;
             Destroy(rangeVisualizer.GetComponent<Collider>());
+        }
+
+        private void OnDestroy()
+        {
+            if (rangeMaterial != null)
+            {
+                Destroy(rangeMaterial);
+            }
         }
     }
 }

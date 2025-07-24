@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Peque.Machines
@@ -44,6 +45,8 @@ namespace Peque.Machines
         /// </summary>
         private void ApplyDamageToItemsInRange()
         {
+            List<System.Guid> itemsToDestroy = new List<System.Guid>();
+
             // 遍历所有物品
             foreach (var itemEntry in GameGrid.Instance.items)
             {
@@ -58,10 +61,23 @@ namespace Peque.Machines
 
                     if (item.Hp <= 0)
                     {
-                        // 如果物品血量<=0，则销毁
-                        GameGrid.Instance.SafeDestroyItem(item.id);
+                        itemsToDestroy.Add(item.id);
+                    }
+                    else
+                    {
+                        HealthBar HpComponent;
+                        item.healthBar.TryGetComponent<HealthBar>(out HpComponent);
+                        if (HpComponent != null)
+                        {
+                            HpComponent.SetHealth(item.Hp);
+                        }
                     }
                 }
+            }
+
+            foreach (var itemId in itemsToDestroy)
+            {
+                GameGrid.Instance.SafeDestroyItem(itemId);
             }
         }
     }

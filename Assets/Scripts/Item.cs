@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Peque
 {
@@ -18,9 +19,12 @@ namespace Peque
         public Vector3 parent;
         public Vector3 position;
         public Type type;
-        public Transform transform;
+        private Transform _transform;
         private int hp = 100; // 初始血量
-        
+
+        // 增加销毁标记
+        private bool isDestroyed = false;
+
         public int maxHp = 100;
         public GameObject healthBar; // 关联的血条对象
 
@@ -35,9 +39,19 @@ namespace Peque
                 if (healthBar != null)
                 {
                     Debug.Log("healthBar.GetComponent<HealthBar>().SetHealth(hp);");
-                    healthBar.GetComponent<HealthBar>().SetHealth(hp);
+                    // healthBar.GetComponent<HealthBar>().SetHealth(hp);
                 }
             }  
+        }
+
+        public Transform transform
+        {
+            get
+            {
+                if (isDestroyed) return null;
+                return _transform;
+            }
+            set { _transform = value; }
         }
 
         public void DestroyHealthBar()
@@ -63,6 +77,19 @@ namespace Peque
             if (healthBar != null)
             {
                 healthBar.SetActive(false);
+            }
+        }
+
+        public void Destroy()
+        {
+            if (isDestroyed) return;
+            isDestroyed = true;
+
+            DestroyHealthBar();
+            if (transform != null)
+            {
+                GameObject.Destroy(transform.gameObject);
+                transform = null;
             }
         }
     }

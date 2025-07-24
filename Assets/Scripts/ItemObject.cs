@@ -4,6 +4,7 @@ namespace Peque
 {
     public class ItemObject : MonoBehaviour
     {
+        [System.NonSerialized]
         public Item item;
 
         void Start()
@@ -12,6 +13,16 @@ namespace Peque
             if (GetComponent<Collider>() == null)
             {
                 gameObject.AddComponent<BoxCollider>();
+            }
+        }
+
+        void OnDestroy()
+        {
+            // 确保销毁时清除引用
+            if (item != null)
+            {
+                item.transform = null;
+                item = null;
             }
         }
     }
