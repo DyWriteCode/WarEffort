@@ -278,6 +278,7 @@
 
 // v2
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Peque.Machines
@@ -466,7 +467,6 @@ namespace Peque.Machines
             }
             catch (System.Exception e)
             {
-                Debug.LogError(e.Message);
                 Debug.LogWarning($"传送物品到传送带失败: {e.Message}");
                 return false;
             }
@@ -522,21 +522,37 @@ namespace Peque.Machines
         /// <summary>
         /// 从传送带移除物品引用
         /// </summary>
-        private void RemoveItemFromBelt(System.Guid itemId)
+        public void RemoveItemFromBelt(System.Guid itemId)
         {
             // 从物品字典移除
-            items.Remove(itemId);
+            if (items.ContainsKey(itemId))
+            {
+                items.Remove(itemId);
+            }
 
             // 从位置字典移除
-            foreach (var position in itemPositions)
+            var positionEntry = itemPositions.FirstOrDefault(p => p.Value == itemId);
+            if (positionEntry.Key != 0)
             {
-                if (position.Value == itemId)
-                {
-                    itemPositions.Remove(position.Key);
-                    break;
-                }
+                itemPositions.Remove(positionEntry.Key);
             }
         }
+
+        //public void SafeRemoveItemFromBelt(System.Guid itemId)
+        //{
+        //    // 从物品字典移除
+        //    if (items.ContainsKey(itemId))
+        //    {
+        //        items.Remove(itemId);
+        //    }
+
+        //    // 从位置字典移除
+        //    var positionEntry = itemPositions.FirstOrDefault(p => p.Value == itemId);
+        //    if (positionEntry.Key != 0)
+        //    {
+        //        itemPositions.Remove(positionEntry.Key);
+        //    }
+        //}
 
         /// <summary>
         /// 移动传送带上的物品

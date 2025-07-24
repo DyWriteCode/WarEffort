@@ -54,22 +54,28 @@ namespace Peque.Machines
                 // 计算物品与建筑的距离
                 float distance = Vector3.Distance(position, item.position);
 
-                if (distance <= damageRange)
+                if (item != null )
                 {
-                    // 应用伤害
-                    item.Hp -= damagePerTick;
+                    if (distance <= damageRange)
+                    {
+                        // 应用伤害
+                        item.Hp -= damagePerTick;
 
-                    if (item.Hp <= 0)
-                    {
-                        itemsToDestroy.Add(item.id);
-                    }
-                    else
-                    {
-                        HealthBar HpComponent;
-                        item.healthBar.TryGetComponent<HealthBar>(out HpComponent);
-                        if (HpComponent != null)
+                        if (item.Hp <= 0)
                         {
-                            HpComponent.SetHealth(item.Hp);
+                            itemsToDestroy.Add(item.id);
+                        }
+                        else
+                        {
+                            HealthBar HpComponent;
+                            if(item.healthBar != null)
+                            {
+                                item.healthBar.TryGetComponent<HealthBar>(out HpComponent);
+                                if (HpComponent != null)
+                                {
+                                    HpComponent.SetHealth(item.Hp);
+                                }
+                            }
                         }
                     }
                 }
@@ -78,6 +84,17 @@ namespace Peque.Machines
             foreach (var itemId in itemsToDestroy)
             {
                 GameGrid.Instance.SafeDestroyItem(itemId);
+            }
+
+            foreach (var machineEntry in GameGrid.Instance.machines.Values.ToList())
+            {
+                if (machineEntry is Belt belt)
+                {
+                    foreach (var itemId in itemsToDestroy)
+                    {
+                        belt.RemoveItemFromBelt(itemId);
+                    }
+                }
             }
         }
     }

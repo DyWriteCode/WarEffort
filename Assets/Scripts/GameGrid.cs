@@ -794,6 +794,14 @@ namespace Peque
                 Destroy(item.transform.gameObject);
             }
 
+            foreach (var machine in machines.Values)
+            {
+                if (machine is Peque.Machines.Belt belt)
+                {
+                    belt.RemoveItemFromBelt(itemId);
+                }
+            }
+
             // 销毁血条
             item.DestroyHealthBar();
             item.Destroy();
