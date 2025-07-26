@@ -358,6 +358,7 @@ public class Machine
         IronFoundry = 3,
         IronSeller = 4,
         AttackMachine = 5,
+        CleanerMachine = 6,
     }
 
     /// <summary>

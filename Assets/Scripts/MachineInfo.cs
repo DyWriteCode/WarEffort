@@ -26,6 +26,10 @@ public class MachineInfo
     public float damageRange = 5f;
     public int damageInterval = 10;
     public int damagePerTick = 10;
+
+    [Header("Cleaner Settings")]
+    public int cleanInterval = 20;
+    public float pollutionReduction = 50f;
 }
 [Serializable]
 public class ItemUI

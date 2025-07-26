@@ -169,6 +169,14 @@ namespace Peque.Machines
                     {
                         itemsToDestroy.Add(item.id);
                     }
+                    else
+                    {
+                        item.healthBar.GetComponent<HealthBar>().SetHealth(item.Hp);
+                    }
+
+                    // 计算并添加污染
+                    float pollutionAmount = damagePerTick * GameGrid.Instance.GetItemInfo(item.type).pollutionFactor;
+                    GameGrid.Instance.AddPollution(pollutionAmount);
                 }
             }
 

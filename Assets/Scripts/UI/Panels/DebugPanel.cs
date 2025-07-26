@@ -6,18 +6,33 @@ using Peque;
 
 public class DebugPanel : MonoBehaviour
 {
-    private Text text;
-    private void Awake() {
-        text = GetComponent<Text>();
-    }
+    public Text objText;
+    public Text pollutionText;
 
     public void updateCount () {
-        text.text = $"Object Number : {GameObject.FindObjectsOfType<SpriteRenderer>().Length.ToString()}";
+        if (objText != null)
+        {
+            objText.text = $"Object Number : {GameObject.FindObjectsOfType<SpriteRenderer>().Length.ToString()}";
+        }
+    }
+
+    public void updatePollution()
+    {
+        if (pollutionText != null)
+        {
+            pollutionText.text = $"PollutionLevel : {GameGrid.Instance.GetPollutionPercentage()}%";
+        }
     }
 
     public void Clear ()
     {
         GameGrid.Instance.ClearAllPlayerBuildings();
+    }
+
+    public void Update()
+    {
+        updateCount();
+        updatePollution();
     }
 
     void OnDrawGizmos()

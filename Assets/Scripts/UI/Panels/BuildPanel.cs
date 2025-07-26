@@ -126,6 +126,10 @@ public class BuildPanel : MonoBehaviour
         {
             machine = new AttackMachine(obj);
         }
+        if (selectedMachine.type == Machine.Type.CleanerMachine)
+        {
+            machine = new CleanerMachine(obj);
+        }
         else if (selectedMachine.type == Machine.Type.Belt)
         {
             machine = new Belt(obj);

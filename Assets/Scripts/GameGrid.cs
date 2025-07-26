@@ -416,6 +416,15 @@ namespace Peque
         public int money;
         private HealthBarManager healthBarManager;
         private float beltTextureOffset;
+
+        [Header("Pollution System")]
+        public float globalPollution = 0f;
+        public float maxPollution = 1000f;
+        public float pollutionWarningThreshold = 700f;
+
+        // 污染度变化事件（可选）
+        public delegate void PollutionChangedHandler(float newPollution);
+        public event PollutionChangedHandler OnPollutionChanged;
         #endregion
 
         #region Initialization
@@ -765,6 +774,37 @@ namespace Peque
                 }
             }
             throw new System.Exception($"未找到物品类型: {type}");
+        }
+
+        /// <summary>
+        /// 增加全局污染度
+        /// </summary>
+        public void AddPollution(float amount)
+        {
+            globalPollution = Mathf.Min(maxPollution, globalPollution + amount);
+            OnPollutionChanged?.Invoke(globalPollution);
+
+            if (globalPollution >= pollutionWarningThreshold)
+            {
+                Debug.LogWarning($"污染度警告: {globalPollution}/{maxPollution}");
+            }
+        }
+
+        /// <summary>
+        /// 减少全局污染度
+        /// </summary>
+        public void ReducePollution(float amount)
+        {
+            globalPollution = Mathf.Max(0, globalPollution - amount);
+            OnPollutionChanged?.Invoke(globalPollution);
+        }
+
+        /// <summary>
+        /// 获取当前污染度百分比
+        /// </summary>
+        public float GetPollutionPercentage()
+        {
+            return globalPollution / maxPollution;
         }
         #endregion
 
