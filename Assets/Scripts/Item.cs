@@ -34,7 +34,13 @@ namespace Peque
             }
         }
 
-        public int Hp { get => hp; set {
+        public int Hp { 
+            get 
+            {
+                return hp;
+            } 
+            set 
+            {
                 hp = value;
             }  
         }
