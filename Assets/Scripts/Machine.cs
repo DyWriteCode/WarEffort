@@ -475,6 +475,10 @@ public class Machine
 
         // 执行生产逻辑
         ProduceOutputItems();
+
+        float pollutionAmount = info.pollutionPerRun * info.pollutionFactor;
+        GameGrid.Instance.AddPollution(pollutionAmount);
+        Debug.Log("add...");
     }
 
     /// <summary>
@@ -778,6 +782,11 @@ public class Machine
         // 检查存储限制
         return info.storageLimits.TryGetValue(type, out int limit) &&
                (currentQuantity + quantity) <= limit;
+    }
+
+    public virtual bool ShouldExecute()
+    {
+        return true; // 默认所有机器都应执行
     }
     #endregion
 }

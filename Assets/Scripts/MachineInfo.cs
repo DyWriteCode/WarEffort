@@ -27,9 +27,12 @@ public class MachineInfo
     public int damageInterval = 10;
     public int damagePerTick = 10;
 
-    [Header("Cleaner Settings")]
-    public int cleanInterval = 20;
-    public float pollutionReduction = 50f;
+    [Header("Pollution Settings")]
+    [Tooltip("每次运行产生的污染值")]
+    public float pollutionPerRun = 1.0f;
+
+    [Tooltip("污染因子（影响污染计算）")]
+    public float pollutionFactor = 1.0f;
 }
 [Serializable]
 public class ItemUI

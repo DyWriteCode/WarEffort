@@ -1328,8 +1328,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 679566296}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: stopBuilding
+        m_TargetAssemblyTypeName: BuildPanel, Assembly-CSharp
+        m_MethodName: StopBuilding
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2195,8 +2195,8 @@ MonoBehaviour:
     damageRange: 5
     damageInterval: 10
     damagePerTick: 10
-    cleanInterval: 20
-    pollutionReduction: 50
+    pollutionPerRun: 1
+    pollutionFactor: 1
   - type: 2
     executionType: 1
     name: Iron Ore Broker
@@ -2219,8 +2219,8 @@ MonoBehaviour:
     damageRange: 5
     damageInterval: 10
     damagePerTick: 10
-    cleanInterval: 20
-    pollutionReduction: 50
+    pollutionPerRun: 1
+    pollutionFactor: 1
   - type: 3
     executionType: 2
     name: Iron Ore Foundry
@@ -2247,8 +2247,8 @@ MonoBehaviour:
     damageRange: 5
     damageInterval: 10
     damagePerTick: 10
-    cleanInterval: 20
-    pollutionReduction: 50
+    pollutionPerRun: 1
+    pollutionFactor: 1
   - type: 4
     executionType: 3
     name: Iron Seller
@@ -2270,8 +2270,8 @@ MonoBehaviour:
     damageRange: 5
     damageInterval: 10
     damagePerTick: 10
-    cleanInterval: 20
-    pollutionReduction: 50
+    pollutionPerRun: 1
+    pollutionFactor: 1
   - type: 5
     executionType: 4
     name: AttackMachine
@@ -2288,10 +2288,10 @@ MonoBehaviour:
     moneyThatGenerates: 5
     price: 200
     damageRange: 5
-    damageInterval: 10
+    damageInterval: 1
     damagePerTick: 10
-    cleanInterval: 20
-    pollutionReduction: 50
+    pollutionPerRun: 1
+    pollutionFactor: 1
   - type: 6
     executionType: 4
     name: CleanerMachine
@@ -2310,8 +2310,8 @@ MonoBehaviour:
     damageRange: 5
     damageInterval: 100
     damagePerTick: 10
-    cleanInterval: 20
-    pollutionReduction: 50
+    pollutionPerRun: 1
+    pollutionFactor: 1
   itemsInfo:
   - name: Coal
     description: Coal

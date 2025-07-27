@@ -119,20 +119,17 @@ public class BuildPanel : MonoBehaviour
         }
 
         GameObject obj = Instantiate(selectedMachine.prefab, getPlacingPosition(gridPosition), Quaternion.identity);
+        //GameObject obj = Instantiate(selectedMachine.prefab, gridPosition, Quaternion.identity);
         obj.name = gridPosition.ToString();
-        Machine machine;
+        Machine machine = null;
         // 根据类型创建不同的机器实例
         if (selectedMachine.type == Machine.Type.AttackMachine)
         {
             machine = new AttackMachine(obj);
         }
-        if (selectedMachine.type == Machine.Type.CleanerMachine)
+        else if (selectedMachine.type == Machine.Type.CleanerMachine)
         {
             machine = new CleanerMachine(obj);
-        }
-        else if (selectedMachine.type == Machine.Type.Belt)
-        {
-            machine = new Belt(obj);
         }
         else
         {

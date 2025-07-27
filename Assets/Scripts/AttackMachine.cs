@@ -130,16 +130,22 @@ namespace Peque.Machines
             controller.damageInterval = info.damageInterval;
             controller.damagePerTick = info.damagePerTick;
             controller.Initialize(this);
-            Run();
+        }
+
+        public override bool ShouldExecute()
+        {
+            return true;
         }
 
         public override void Run()
         {
-            Debug.Log("running...");
             base.Run(); // 调用基类方法
             currentTick++;
             if (currentTick < damageInterval) return;
             currentTick = 0; // 重置计数器
+            // 根据伤害范围计算额外污染
+            float areaPollution = damageRange * 0.1f;
+            GameGrid.Instance.AddPollution(areaPollution);
             ApplyDamageToItemsInRange();
         }
 
@@ -185,12 +191,13 @@ namespace Peque.Machines
             // 销毁所有血量耗尽的物品
             foreach (var itemId in itemsToDestroy)
             {
-                // 在销毁时计算污染
-                if (GameGrid.Instance.items.TryGetValue(itemId, out Item item))
-                {
-                    float pollutionAmount = damagePerTick * GameGrid.Instance.GetItemInfo(item.type).pollutionFactor;
-                    GameGrid.Instance.AddPollution(pollutionAmount);
-                }
+                //// 在销毁时计算污染
+                //if (GameGrid.Instance.items.TryGetValue(itemId, out Item item))
+                //{
+                //    float pollutionAmount = damagePerTick * GameGrid.Instance.GetItemInfo(item.type).pollutionFactor;
+                //    GameGrid.Instance.AddPollution(pollutionAmount);
+                //    Debug.Log(GameGrid.Instance.GetPollutionPercentage());
+                //}
 
                 GameGrid.Instance.SafeDestroyItem(itemId);
             }

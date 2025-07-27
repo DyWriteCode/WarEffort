@@ -419,7 +419,7 @@ namespace Peque
 
         [Header("Pollution System")]
         public float globalPollution = 0f;
-        public float maxPollution = 1000f;
+        public float maxPollution = 100f;
         public float pollutionWarningThreshold = 700f;
 
         // 污染度变化事件（可选）
@@ -618,8 +618,13 @@ namespace Peque
         {
             foreach (Machine machine in machines.Values)
             {
-                if (machine == null) continue;
-                machine.Run();
+                if (machine != null)
+                {
+                    if (machine.ShouldExecute())
+                    {
+                        machine.Run();
+                    }
+                }
             }
         }
 

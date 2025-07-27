@@ -34,8 +34,6 @@ public class HealthBar : MonoBehaviour
 
     public void SetHealth(int currentHp, int maxHp = -1)
     {
-        Debug.Log(0);
-
         if (healthSlider == null) return;
 
         // 更新血量值
