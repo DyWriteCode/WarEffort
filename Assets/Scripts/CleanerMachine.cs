@@ -10,7 +10,7 @@ namespace Peque.Machines
         // 清洁间隔（单位：游戏刻）
         public int cleanInterval = 20;
         // 每次清洁减少的污染值
-        public float pollutionReduction = 50f;
+        public float pollutionReduction = 10f;
 
         private int currentTick = 0;
 

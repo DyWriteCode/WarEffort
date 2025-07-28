@@ -20,7 +20,7 @@ public class DebugPanel : MonoBehaviour
     {
         if (pollutionText != null)
         {
-            pollutionText.text = $"PollutionLevel : {GameGrid.Instance.GetPollutionPercentage()}%";
+            pollutionText.text = $"PollutionLevel : {GameGrid.Instance.GetPollutionPercentage()}";
         }
     }
 

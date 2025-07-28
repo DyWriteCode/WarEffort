@@ -478,7 +478,6 @@ public class Machine
 
         float pollutionAmount = info.pollutionPerRun * info.pollutionFactor;
         GameGrid.Instance.AddPollution(pollutionAmount);
-        Debug.Log("add...");
     }
 
     /// <summary>
