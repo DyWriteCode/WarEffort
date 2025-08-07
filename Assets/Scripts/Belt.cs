@@ -3,7 +3,7 @@
 //using System.Collections.Generic;
 //using UnityEngine;
 
-//namespace Peque.Machines
+//namespace FactorySystem.Machines
 //{
 //    public class Belt : Machine
 //    {
@@ -281,7 +281,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Peque.Machines
+namespace FactorySystem.Machines
 {
     /// <summary>
     /// 传送带机器类，负责物品在传送带上的移动和传输

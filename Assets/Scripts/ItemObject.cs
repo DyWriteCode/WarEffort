@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Peque
+namespace FactorySystem
 {
     public class ItemObject : MonoBehaviour
     {

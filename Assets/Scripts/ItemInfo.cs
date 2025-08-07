@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Peque
+namespace FactorySystem
 {
     [Serializable]
     public class ItemInfo

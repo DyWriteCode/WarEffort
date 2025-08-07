@@ -1,6 +1,6 @@
 #region v1 code
-//using Peque.Machines;
-//using Peque;
+//using FactorySystem.Machines;
+//using FactorySystem;
 //using UnityEngine;
 
 //public class AttackMachineController : MonoBehaviour
@@ -27,7 +27,7 @@
 //}
 #endregion
 
-using Peque.Machines;
+using FactorySystem.Machines;
 using UnityEngine;
 
 /// <summary>

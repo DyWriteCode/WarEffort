@@ -4,7 +4,7 @@
 //using System.Linq;
 //using UnityEngine;
 
-//namespace Peque { 
+//namespace FactorySystem { 
 //    public class GameGrid : MonoBehaviour
 //    {
 //        public enum Position
@@ -370,7 +370,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Peque
+namespace FactorySystem
 {
     /// <summary>
     /// 游戏网格管理系统，负责管理所有机器、物品和网格状态
@@ -473,8 +473,8 @@ namespace Peque
         {
             // 设置定时器
             float interval = 1.0f / ticksPerSecond;
-            InvokeRepeating("ProcessBeltMovements", 0, interval);
-            InvokeRepeating("ExecuteMachines", 0, interval);
+            InvokeRepeating(nameof(ProcessBeltMovements), 0, interval);
+            InvokeRepeating(nameof(ExecuteMachines), 0, interval);
         }
         #endregion
 
@@ -841,7 +841,7 @@ namespace Peque
 
             foreach (var machine in machines.Values)
             {
-                if (machine is Peque.Machines.Belt belt)
+                if (machine is FactorySystem.Machines.Belt belt)
                 {
                     belt.RemoveItemFromBelt(itemId);
                 }

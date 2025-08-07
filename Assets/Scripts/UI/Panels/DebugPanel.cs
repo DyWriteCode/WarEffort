@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Peque;
+using FactorySystem;
 
 public class DebugPanel : MonoBehaviour
 {

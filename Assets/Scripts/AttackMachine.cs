@@ -3,7 +3,7 @@
 //using System.Linq;
 //using UnityEngine;
 
-//namespace Peque.Machines
+//namespace FactorySystem.Machines
 //{
 //    /// <summary>
 //    /// 伤害区域机器，定期对范围内的物品造成伤害
@@ -106,7 +106,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Peque.Machines
+namespace FactorySystem.Machines
 {
     /// <summary>
     /// 伤害区域机器，定期对范围内的物品造成伤害

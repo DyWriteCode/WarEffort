@@ -3,8 +3,8 @@
 //using System;
 //using System.Collections.Generic;
 //using UnityEngine;
-//using Peque;
-//using Peque.Machines;
+//using FactorySystem;
+//using FactorySystem.Machines;
 //using System.Linq;
 
 //public class Machine
@@ -327,8 +327,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Peque;
-using Peque.Machines;
+using FactorySystem;
+using FactorySystem.Machines;
 
 /// <summary>
 /// 机器基类，表示游戏中的各种生产设备
