@@ -1,5 +1,5 @@
 using UnityEngine;
-using Peque;
+using FactorySystem;
 using UnityEngine.UI;
 
 public class HealthBar : MonoBehaviour

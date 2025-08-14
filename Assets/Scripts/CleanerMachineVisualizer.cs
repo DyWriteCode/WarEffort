@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Peque.Machines
+namespace FactorySystem.Machines
 {
     /// <summary>
     /// 清洁机器可视化组件

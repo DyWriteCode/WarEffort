@@ -3,8 +3,8 @@
 //using System;
 //using System.Collections.Generic;
 //using UnityEngine;
-//using Peque;
-//using Peque.Machines;
+//using FactorySystem;
+//using FactorySystem.Machines;
 //using System.Linq;
 
 //public class Machine
@@ -39,7 +39,7 @@
 
 //    public MachineInfo info {
 //        get {
-//            return GameGrid.Instance.GetMachineInfo(type);
+//            return GameGirdManager.Instance.GetMachineInfo(type);
 //        }
 //    }
 
@@ -60,7 +60,7 @@
 //    public void delete () {
 //        if (connections != null) {
 //            foreach (Vector3 neighbor in connections.Keys) {
-//                Machine neighborMachine = GameGrid.Instance.GetMachineAt(neighbor);
+//                Machine neighborMachine = GameGirdManager.Instance.GetMachineAt(neighbor);
 
 //                if (neighborMachine.type == Type.Belt) {
 //                    ((Belt)neighborMachine).removeConnection(position, type);
@@ -72,10 +72,10 @@
 
 //        GameObject.Destroy(gameObject);
 
-//        foreach(Vector3 pos in GameGrid.Instance.GetMachineBlocks(position, type)) {
-//            GameGrid.Instance.grid.Remove(pos);
+//        foreach(Vector3 pos in GameGirdManager.Instance.GetMachineBlocks(position, type)) {
+//            GameGirdManager.Instance.grid.Remove(pos);
 //        }
-//        GameGrid.Instance.machines.Remove(position);
+//        GameGirdManager.Instance.machines.Remove(position);
 //    }
 
 //    public void addConnection (Vector3 neighbor, ConnectionType connectionType) {
@@ -92,7 +92,7 @@
 //     * we need to check each one individually
 //    */
 //    public void removeConnection (Vector3 neighbor, Type type) {
-//        foreach (var pos in GameGrid.Instance.GetMachineBlocks(neighbor, type)) {
+//        foreach (var pos in GameGirdManager.Instance.GetMachineBlocks(neighbor, type)) {
 //            if (connections.ContainsKey(pos)) {
 //                connections.Remove(pos);
 //                onUpdateConnection(pos);
@@ -112,7 +112,7 @@
 //            return;
 //        }
 
-//        MachineInfo machineInfo = GameGrid.Instance.GetMachineInfo(type);
+//        MachineInfo machineInfo = GameGirdManager.Instance.GetMachineInfo(type);
 
 //        // reset timer
 //        ticksUntilNextExecution = machineInfo.ticksBetweenExecution;
@@ -157,20 +157,20 @@
 //                }
 //                break;
 //            case ExecutionType.Seller:
-//                GameGrid.Instance.money += info.moneyThatGenerates;
+//                GameGirdManager.Instance.money += info.moneyThatGenerates;
 //                foreach (var conn in connections.Where(c => c.Value == ConnectionType.Input))
 //                {
-//                    Machine inputMachine = GameGrid.Instance.GetMachineAt(conn.Key);
+//                    Machine inputMachine = GameGirdManager.Instance.GetMachineAt(conn.Key);
 //                    if (inputMachine is Belt inputBelt)
 //                    {
 //                        // 销毁传送带最后一个物品
 //                        if (inputBelt.itemPositions.TryGetValue(4, out Guid itemId))
 //                        {
-//                            if (GameGrid.Instance.items.TryGetValue(itemId, out Item item))
+//                            if (GameGirdManager.Instance.items.TryGetValue(itemId, out Item item))
 //                            {
 //                                GameObject.Destroy(item.transform.gameObject);
 //                                GameObject.Destroy(item.healthBar);
-//                                GameGrid.Instance.items.Remove(itemId);
+//                                GameGirdManager.Instance.items.Remove(itemId);
 //                            }
 //                            inputBelt.items.Remove(itemId);
 //                            inputBelt.itemPositions.Remove(4);
@@ -205,7 +205,7 @@
 
 //        foreach (KeyValuePair<Vector3, ConnectionType> connection in connections)
 //        {
-//            if (connection.Value == ConnectionType.Output && ((Belt)GameGrid.Instance.GetMachineAt(connection.Key)).hasFreeSlots)
+//            if (connection.Value == ConnectionType.Output && ((Belt)GameGirdManager.Instance.GetMachineAt(connection.Key)).hasFreeSlots)
 //            {
 //                outputConnections++;
 //            }
@@ -221,7 +221,7 @@
 
 //        foreach (KeyValuePair<Vector3, ConnectionType> connection in connections)
 //        {
-//            Belt belt = (Belt)GameGrid.Instance.GetMachineAt(connection.Key);
+//            Belt belt = (Belt)GameGirdManager.Instance.GetMachineAt(connection.Key);
 //            if (connection.Value == ConnectionType.Output && belt.hasFreeSlots)
 //            {
 //                belt.addItem(machineInfo.itemsThatProduces.First().type);
@@ -249,7 +249,7 @@
 
 //            foreach (var conn in connections.Where(c => c.Value == ConnectionType.Input))
 //            {
-//                Machine inputMachine = GameGrid.Instance.GetMachineAt(conn.Key);
+//                Machine inputMachine = GameGirdManager.Instance.GetMachineAt(conn.Key);
 //                if (inputMachine is Belt inputBelt)
 //                {
 //                    // 查找匹配类型的物品
@@ -257,33 +257,33 @@
 //                    if (itemEntry.Key != default)
 //                    {
 //                        Guid itemId = itemEntry.Key;
-//                        if (GameGrid.Instance.items.TryGetValue(itemId, out Item itemObj))
+//                        if (GameGirdManager.Instance.items.TryGetValue(itemId, out Item itemObj))
 //                        {
 //                            // 在销毁物品的地方添加以下逻辑
-//                            if (GameGrid.Instance.itemsToMove.Contains(itemId))
+//                            if (GameGirdManager.Instance.itemsToMove.Contains(itemId))
 //                            {
 //                                // 创建临时队列，移除待移动物品
 //                                Queue<System.Guid> newQueue = new Queue<System.Guid>();
-//                                while (GameGrid.Instance.itemsToMove.Count > 0)
+//                                while (GameGirdManager.Instance.itemsToMove.Count > 0)
 //                                {
-//                                    System.Guid currentId = GameGrid.Instance.itemsToMove.Dequeue();
+//                                    System.Guid currentId = GameGirdManager.Instance.itemsToMove.Dequeue();
 //                                    if (currentId != itemId)
 //                                    {
 //                                        newQueue.Enqueue(currentId);
 //                                    }
 //                                }
-//                                GameGrid.Instance.itemsToMove = newQueue;
+//                                GameGirdManager.Instance.itemsToMove = newQueue;
 //                            }
-//                            GameGrid.Instance.SafeRemoveItemFromQueues(itemId);
+//                            GameGirdManager.Instance.SafeRemoveItemFromQueues(itemId);
 
 //                            Item item_obj = null;
 
 //                            // 然后销毁物品
-//                            if (GameGrid.Instance.items.TryGetValue(itemId, out item_obj))
+//                            if (GameGirdManager.Instance.items.TryGetValue(itemId, out item_obj))
 //                            {
 //                                GameObject.Destroy(item_obj.transform.gameObject);
 //                                item_obj.DestroyHealthBar();
-//                                GameGrid.Instance.items.Remove(itemId);
+//                                GameGirdManager.Instance.items.Remove(itemId);
 //                            }
 //                        }
 //                        inputBelt.items.Remove(itemId);
@@ -327,8 +327,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Peque;
-using Peque.Machines;
+using FactorySystem;
+using FactorySystem.Machines;
 
 /// <summary>
 /// 机器基类，表示游戏中的各种生产设备
@@ -404,7 +404,7 @@ public class Machine
     /// <summary>
     /// 获取机器信息
     /// </summary>
-    public MachineInfo info => GameGrid.Instance.GetMachineInfo(type);
+    public MachineInfo info => GameApp.MachineManager.GetMachineInfo(type);
     #endregion
 
     #region Constructor
@@ -433,7 +433,7 @@ public class Machine
     /// </summary>
     public void RemoveConnection(Vector3 neighbor, Type neighborType)
     {
-        foreach (var pos in GameGrid.Instance.GetMachineBlocks(neighbor, neighborType))
+        foreach (var pos in GameApp.MachineManager.GetMachineBlocks(neighbor, neighborType))
         {
             if (connections.ContainsKey(pos))
             {
@@ -477,7 +477,7 @@ public class Machine
         ProduceOutputItems();
 
         float pollutionAmount = info.pollutionPerRun * info.pollutionFactor;
-        GameGrid.Instance.AddPollution(pollutionAmount);
+        GameApp.PollutionManager.AddPollution(pollutionAmount);
     }
 
     /// <summary>
@@ -579,12 +579,12 @@ public class Machine
     private void ExecuteSellingProcess()
     {
         // 增加资金
-        GameGrid.Instance.money += info.moneyThatGenerates;
+        GameApp.EcomoneyManager.AddMoney(info.moneyThatGenerates);
 
         // 销毁输入传送带上的物品
         foreach (var conn in connections.Where(c => c.Value == ConnectionType.Input))
         {
-            if (GameGrid.Instance.GetMachineAt(conn.Key) is Belt inputBelt)
+            if (GameApp.MachineManager.GetMachineAt(conn.Key) is Belt inputBelt)
             {
                 DestroyLastItemOnBelt(inputBelt);
             }
@@ -600,7 +600,7 @@ public class Machine
     {
         foreach (var conn in connections.Where(c => c.Value == ConnectionType.Input))
         {
-            if (GameGrid.Instance.GetMachineAt(conn.Key) is Belt inputBelt)
+            if (GameApp.MachineManager.GetMachineAt(conn.Key) is Belt inputBelt)
             {
                 RemoveMatchingItemsFromBelt(inputBelt, requirement.type);
             }
@@ -619,7 +619,7 @@ public class Machine
         System.Guid itemId = matchingItem.Key;
 
         // 安全销毁物品
-        GameGrid.Instance.SafeDestroyItem(itemId);
+        GameApp.ItemManager.SafeDestroyItem(itemId);
 
         // 从传送带移除引用
         belt.items.Remove(itemId);
@@ -645,11 +645,11 @@ public class Machine
     {
         if (!belt.itemPositions.TryGetValue(4, out Guid itemId)) return;
 
-        if (GameGrid.Instance.items.TryGetValue(itemId, out Item item))
+        if (GameApp.ItemManager.Items.TryGetValue(itemId, out Item item))
         {
             GameObject.Destroy(item.transform.gameObject);
             item.DestroyHealthBar();
-            GameGrid.Instance.items.Remove(itemId);
+            GameApp.ItemManager.Items.Remove(itemId);
         }
 
         belt.items.Remove(itemId);
@@ -695,7 +695,7 @@ public class Machine
         return connections
             .Where(conn =>
                 conn.Value == ConnectionType.Output &&
-                GameGrid.Instance.GetMachineAt(conn.Key) is Belt neighborBelt &&
+                GameApp.MachineManager.GetMachineAt(conn.Key) is Belt neighborBelt &&
                 neighborBelt.hasFreeSlots)
             .ToList();
     }
@@ -705,7 +705,7 @@ public class Machine
     /// </summary>
     private void SendItemToOutput(Vector3 outputPosition)
     {
-        Belt outputBelt = (Belt)GameGrid.Instance.GetMachineAt(outputPosition);
+        Belt outputBelt = (Belt)GameApp.MachineManager.GetMachineAt(outputPosition);
         Item.Type itemType = info.itemsThatProduces.First().type;
 
         // 减少库存并添加到传送带
@@ -726,26 +726,23 @@ public class Machine
         // 销毁游戏对象
         if (gameObject != null)
         {
-            GameObject.Destroy(gameObject);
+            gameObject.AddComponent<DestroyObj>().DestroyObject(0);
         }
 
-        // 清理网格占用
-        ClearGridOccupancy();
-
         // 从网格管理器中移除
-        GameGrid.Instance.machines.Remove(position);
+        GameApp.MachineManager.DeleteMachine(position);
     }
 
     /// <summary>
     /// 清理所有连接
     /// </summary>
-    private void CleanupConnections()
+    public void CleanupConnections()
     {
         if (connections == null) return;
 
         foreach (Vector3 neighbor in connections.Keys.ToList())
         {
-            Machine neighborMachine = GameGrid.Instance.GetMachineAt(neighbor);
+            Machine neighborMachine = GameApp.MachineManager.GetMachineAt(neighbor);
             if (neighborMachine == null) continue;
 
             if (neighborMachine.type == Type.Belt)
@@ -756,17 +753,6 @@ public class Machine
             {
                 neighborMachine.RemoveConnection(position, type);
             }
-        }
-    }
-
-    /// <summary>
-    /// 清理网格占用
-    /// </summary>
-    private void ClearGridOccupancy()
-    {
-        foreach (Vector3 pos in GameGrid.Instance.GetMachineBlocks(position, type))
-        {
-            GameGrid.Instance.gridOccupancy.Remove(pos);
         }
     }
 

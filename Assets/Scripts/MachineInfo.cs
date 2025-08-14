@@ -1,4 +1,4 @@
-﻿using Peque;
+﻿using FactorySystem;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -104,7 +104,7 @@ public class MachineInfo
     /// </summary>
     [Header("污染设置")]
     [Tooltip("每次运行产生的基础污染值")]
-    public float pollutionPerRun = 0f;
+    public float pollutionPerRun = 1f;
 
     /// <summary>
     /// 污染系数（影响最终污染计算）

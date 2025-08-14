@@ -3,7 +3,7 @@
 //using System.Collections.Generic;
 //using UnityEngine;
 
-//namespace Peque.Machines
+//namespace FactorySystem.Machines
 //{
 //    public class Belt : Machine
 //    {
@@ -46,10 +46,10 @@
 //            item.position = spawnPos;
 //            item.parent = position;
 
-//            GameGrid.Instance.items.Add(item.id, item);
-//            GameGrid.Instance.itemsToCreate.Enqueue(item.id);
+//            GameGirdManager.Instance.items.Add(item.id, item);
+//            GameGirdManager.Instance.itemsToCreate.Enqueue(item.id);
 
-//            GameObject obj = GameGrid.Instantiate(GameGrid.Instance.getItemInfo(type).prefab, spawnPos, Quaternion.Euler(-90, 0, 0), gameObject.transform);
+//            GameObject obj = GameGirdManager.Instantiate(GameGirdManager.Instance.getItemInfo(type).prefab, spawnPos, Quaternion.Euler(-90, 0, 0), gameObject.transform);
 //            item.transform = obj.transform;
 //            addToItems(item.id, type);
 //        }
@@ -59,14 +59,14 @@
 //            items.Add(item, type);
 //            itemPositions.Add(1, item);
 //            Debug.Log("-1");
-//            GameGrid.Instance.items[item].parent = position;
-//            GameGrid.Instance.items[item].position = positions[1];
-//            GameGrid.Instance.itemsToMove.Enqueue(item);
+//            GameGirdManager.Instance.items[item].parent = position;
+//            GameGirdManager.Instance.items[item].position = positions[1];
+//            GameGirdManager.Instance.itemsToMove.Enqueue(item);
 
-//            if (GameGrid.Instance.items[item].healthBar)
+//            if (GameGirdManager.Instance.items[item].healthBar)
 //            {
-//                Transform transform = GameGrid.Instance.items[item].transform;
-//                GameGrid.Instance.items[item].healthBar.GetComponent<HealthBar>().target = transform;
+//                Transform transform = GameGirdManager.Instance.items[item].transform;
+//                GameGirdManager.Instance.items[item].healthBar.GetComponent<HealthBar>().target = transform;
 //            }
 //        }
 
@@ -83,7 +83,7 @@
 //                        continue;
 //                    }
 
-//                    Machine neighborMachine = GameGrid.Instance.getMachineAt(connection.Key);
+//                    Machine neighborMachine = GameGirdManager.Instance.getMachineAt(connection.Key);
 
 //                    if (neighborMachine.type == Type.Belt)
 //                    {
@@ -117,37 +117,37 @@
 //                        neighborMachine.storedItems[itemType]++;
 
 //                        System.Guid itemId = itemPositions[4];
-//                        if (GameGrid.Instance.items.TryGetValue(itemId, out Item item))
+//                        if (GameGirdManager.Instance.items.TryGetValue(itemId, out Item item))
 //                        {
 //                            // 在销毁物品的地方添加以下逻辑
-//                            if (GameGrid.Instance.itemsToMove.Contains(itemId))
+//                            if (GameGirdManager.Instance.itemsToMove.Contains(itemId))
 //                            {
 //                                // 创建临时队列，移除待移动物品
 //                                Queue<System.Guid> newQueue = new Queue<System.Guid>();
-//                                while (GameGrid.Instance.itemsToMove.Count > 0)
+//                                while (GameGirdManager.Instance.itemsToMove.Count > 0)
 //                                {
-//                                    System.Guid currentId = GameGrid.Instance.itemsToMove.Dequeue();
+//                                    System.Guid currentId = GameGirdManager.Instance.itemsToMove.Dequeue();
 //                                    if (currentId != itemId)
 //                                    {
 //                                        newQueue.Enqueue(currentId);
 //                                    }
 //                                }
-//                                GameGrid.Instance.itemsToMove = newQueue;
+//                                GameGirdManager.Instance.itemsToMove = newQueue;
 //                            }
-//                            GameGrid.Instance.SafeRemoveItemFromQueues(itemId);
+//                            GameGirdManager.Instance.SafeRemoveItemFromQueues(itemId);
 
 //                            // 然后销毁物品
-//                            if (GameGrid.Instance.items.TryGetValue(itemId, out item))
+//                            if (GameGirdManager.Instance.items.TryGetValue(itemId, out item))
 //                            {
 //                                GameObject.Destroy(item.transform.gameObject);
 //                                item.DestroyHealthBar();
-//                                GameGrid.Instance.items.Remove(itemId);
+//                                GameGirdManager.Instance.items.Remove(itemId);
 //                            }
 //                        }
 
 //                        // unlink from this belt
 //                        items.Remove(itemPositions[4]);
-//                        //GameGrid.Destroy(itemPositions[4].gameObject);
+//                        //GameGirdManager.Destroy(itemPositions[4].gameObject);
 //                        itemPositions.Remove(4);
 //                    }
 //                }
@@ -156,20 +156,20 @@
 
 //            if (itemPositions.ContainsKey(3) && !itemPositions.ContainsKey(4))
 //            {
-//                GameGrid.Instance.moveItem(itemPositions[3], positions[4]);
+//                GameGirdManager.Instance.moveItem(itemPositions[3], positions[4]);
 //                itemPositions.Add(4, itemPositions[3]);
 //                itemPositions.Remove(3);
 //            }
 
 //            if (itemPositions.ContainsKey(2) && !itemPositions.ContainsKey(3))
 //            {
-//                GameGrid.Instance.moveItem(itemPositions[2], positions[3]);
+//                GameGirdManager.Instance.moveItem(itemPositions[2], positions[3]);
 //                itemPositions.Add(3, itemPositions[2]);
 //                itemPositions.Remove(2);
 //            }
 //            if (itemPositions.ContainsKey(1) && !itemPositions.ContainsKey(2))
 //            {
-//                GameGrid.Instance.moveItem(itemPositions[1], positions[2]);
+//                GameGirdManager.Instance.moveItem(itemPositions[1], positions[2]);
 //                itemPositions.Add(2, itemPositions[1]);
 //                itemPositions.Remove(1);
 //            }
@@ -196,11 +196,11 @@
 //        public void refreshBarrier(Vector3 neighbor)
 //        {
 //            Direction barrierToRemove = Direction.Right;
-//            GameGrid.Position neighborPosition = GameGrid.Instance.getNeighborPosition(position, neighbor);
+//            GameGirdManager.Position neighborPosition = GameGirdManager.Instance.getNeighborPosition(position, neighbor);
 
 //            switch (neighborPosition)
 //            {
-//                case GameGrid.Position.Right:
+//                case GameGirdManager.Position.Right:
 //                    switch (direction)
 //                    {
 //                        case Direction.Up:
@@ -217,7 +217,7 @@
 //                            break;
 //                    }
 //                    break;
-//                case GameGrid.Position.Left:
+//                case GameGirdManager.Position.Left:
 //                    switch (direction)
 //                    {
 //                        case Direction.Up:
@@ -234,7 +234,7 @@
 //                            break;
 //                    }
 //                    break;
-//                case GameGrid.Position.Top:
+//                case GameGirdManager.Position.Top:
 //                    switch (direction)
 //                    {
 //                        case Direction.Up:
@@ -251,7 +251,7 @@
 //                            break;
 //                    }
 //                    break;
-//                case GameGrid.Position.Bottom:
+//                case GameGirdManager.Position.Bottom:
 //                    switch (direction)
 //                    {
 //                        case Direction.Up:
@@ -281,7 +281,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Peque.Machines
+namespace FactorySystem.Machines
 {
     /// <summary>
     /// 传送带机器类，负责物品在传送带上的移动和传输
@@ -337,12 +337,12 @@ namespace Peque.Machines
             };
 
             // 添加到全局物品系统
-            GameGrid.Instance.items.Add(item.id, item);
-            GameGrid.Instance.itemsToCreate.Enqueue(item.id);
+            GameApp.ItemManager.Items.Add(item.id, item);
+            GameApp.ItemManager.ItemsToCreate.Enqueue(item.id);
 
             // 实例化物品游戏对象
-            GameObject obj = GameGrid.Instantiate(
-                GameGrid.Instance.GetItemInfo(type).prefab,
+            GameObject obj = GameObject.Instantiate(
+                GameApp.ItemManager.GetItemInfo(type).prefab,
                 spawnPos,
                 Quaternion.Euler(-90, 0, 0),
                 gameObject.transform
@@ -368,17 +368,17 @@ namespace Peque.Machines
             itemPositions.Add(1, itemId);
 
             // 更新物品父对象和位置
-            GameGrid.Instance.items[itemId].parent = position;
-            GameGrid.Instance.items[itemId].position = positions[1];
-            GameGrid.Instance.itemsToMove.Enqueue(itemId);
+            GameApp.ItemManager.Items[itemId].parent = position;
+            GameApp.ItemManager.Items[itemId].position = positions[1];
+            GameApp.ItemManager.ItemsToMove.Enqueue(itemId);
 
             // 更新血条目标位置
-            if (GameGrid.Instance.items[itemId].healthBar != null)
+            if (GameApp.ItemManager.Items[itemId].healthBar != null)
             {
-                HealthBar healthBar = GameGrid.Instance.items[itemId].healthBar.GetComponent<HealthBar>();
+                HealthBar healthBar = GameApp.ItemManager.Items[itemId].healthBar.GetComponent<HealthBar>();
                 if (healthBar != null)
                 {
-                    healthBar.target = GameGrid.Instance.items[itemId].transform;
+                    healthBar.target = GameApp.ItemManager.Items[itemId].transform;
                 }
             }
         }
@@ -413,7 +413,7 @@ namespace Peque.Machines
                 if (connection.Value == ConnectionType.Input)
                     continue;
 
-                Machine neighborMachine = GameGrid.Instance.GetMachineAt(connection.Key);
+                Machine neighborMachine = GameApp.MachineManager.GetMachineAt(connection.Key);
                 if (neighborMachine == null)
                     continue;
 
@@ -500,10 +500,10 @@ namespace Peque.Machines
         /// </summary>
         private void SafeDestroyItem(System.Guid itemId)
         {
-            if (GameGrid.Instance.items.TryGetValue(itemId, out Item item))
+            if (GameApp.ItemManager.Items.TryGetValue(itemId, out Item item))
             {
                 // 从移动队列中移除
-                GameGrid.Instance.SafeRemoveItemFromQueues(itemId);
+                GameApp.ItemManager.SafeRemoveItemFromQueues(itemId);
 
                 // 销毁游戏对象
                 if (item.transform != null)
@@ -515,7 +515,7 @@ namespace Peque.Machines
                 item.DestroyHealthBar();
 
                 // 从全局物品系统移除
-                GameGrid.Instance.items.Remove(itemId);
+                GameApp.ItemManager.Items.Remove(itemId);
             }
         }
 
@@ -578,7 +578,7 @@ namespace Peque.Machines
                 System.Guid itemId = itemPositions[fromSlot];
 
                 // 更新物品位置
-                GameGrid.Instance.RequestItemMove(itemId, positions[toSlot]);
+                GameApp.ItemManager.RequestItemMove(itemId, positions[toSlot]);
 
                 // 更新槽位映射
                 itemPositions.Add(toSlot, itemId);
@@ -638,12 +638,12 @@ namespace Peque.Machines
         /// </summary>
         private Direction GetBarrierToRemove(Vector3 neighbor)
         {
-            GameGrid.Position neighborPosition = GameGrid.Instance.GetNeighborPosition(position, neighbor);
+            MachineManager.Position neighborPosition = GameApp.MachineManager.GetNeighborPosition(position, neighbor);
 
             // 根据当前方向和邻居位置确定需要移除的屏障
             switch (neighborPosition)
             {
-                case GameGrid.Position.Right:
+                case MachineManager.Position.Right:
                     switch (direction)
                     {
                         case Direction.Up: return Direction.Right;
@@ -653,7 +653,7 @@ namespace Peque.Machines
                     }
                     break;
 
-                case GameGrid.Position.Left:
+                 case MachineManager.Position.Left:
                     switch (direction)
                     {
                         case Direction.Up: return Direction.Left;
@@ -663,7 +663,7 @@ namespace Peque.Machines
                     }
                     break;
 
-                case GameGrid.Position.Top:
+                case MachineManager.Position.Top:
                     switch (direction)
                     {
                         case Direction.Up: return Direction.Up;
@@ -673,7 +673,7 @@ namespace Peque.Machines
                     }
                     break;
 
-                case GameGrid.Position.Bottom:
+                case MachineManager.Position.Bottom:
                     switch (direction)
                     {
                         case Direction.Up: return Direction.Down;

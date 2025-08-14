@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Peque.Machines
+namespace FactorySystem.Machines
 {
     /// <summary>
     /// 清洁机器，定期减少全局污染度
@@ -37,7 +37,7 @@ namespace Peque.Machines
         /// </summary>
         private void CleanPollution()
         {
-            GameGrid.Instance.ReducePollution(pollutionReduction);
+            GameApp.PollutionManager.ReducePollution(pollutionReduction);
 
             // 添加清洁特效
             if (gameObject != null)

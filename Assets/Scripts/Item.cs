@@ -4,7 +4,7 @@ using System.Net;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Peque
+namespace FactorySystem
 {
     public class Item
     {
@@ -30,7 +30,7 @@ namespace Peque
 
         public ItemInfo info {
             get {
-                return GameGrid.Instance.GetItemInfo(type);
+                return GameApp.ItemManager.GetItemInfo(type);
             }
         }
 

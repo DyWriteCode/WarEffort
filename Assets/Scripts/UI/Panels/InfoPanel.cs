@@ -1,4 +1,4 @@
-﻿using Peque;
+﻿using FactorySystem;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -22,7 +22,8 @@ public class InfoPanel : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0) && !UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject()) {
+        if (Input.GetMouseButtonDown(0) && !UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
+        {
             trySelectMachine();
         }
     }
@@ -36,19 +37,22 @@ public class InfoPanel : MonoBehaviour
             return;
         }
 
-        Vector3 gridPosition = GameGrid.Instance.GetNearestPointOnGrid(hitInfo.point);
+        Vector3 gridPosition = GameApp.GameGridManager.GetNearestPointOnGrid(hitInfo.point);
 
-        if (GameGrid.Instance.IsPositionAvailable(gridPosition)) {
+        if (GameApp.MachineManager.IsPositionOccupied(gridPosition)) {
             return;
         }
 
-        if (!updaterStarted) {
-            updaterStarted = true;
-            InvokeRepeating("updateShownInfo", 0, 1);
+        selectedMachine = GameApp.MachineManager.GetMachineAt(gridPosition);
+        if (selectedMachine != null)
+        {
+            if (!updaterStarted)
+            {
+                updaterStarted = true;
+                InvokeRepeating(nameof(updateShownInfo), 0, 1);
+            }
+            setSelectedMachine(selectedMachine.info);
         }
-
-        selectedMachine = GameGrid.Instance.GetMachineAt(gridPosition);
-        setSelectedMachine(selectedMachine.info);
     }
 
     public void setSelectedMachine (MachineInfo machineInfo) {
@@ -57,23 +61,27 @@ public class InfoPanel : MonoBehaviour
         machineName.text = machineInfo.name;
         description.text = machineInfo.description;
 
-        if (machineInfo.executionType == Machine.ExecutionType.Converter) {
+        if (machineInfo.executionType == Machine.ExecutionType.Converter) 
+        {
             description.text += " | Produces ";
         }
     }
 
     private void updateShownInfo () {
         string storedItemsSummary = "";
-        if (selectedMachine.storedItems.Count > 0)
+        if (selectedMachine != null)
         {
-            foreach (KeyValuePair<Item.Type, int> storedItem in selectedMachine.storedItems)
+            if (selectedMachine.storedItems.Count > 0)
             {
-                int value = 0;
-                selectedMachineInfo.storageLimits.TryGetValue(storedItem.Key, out value);
-                storedItemsSummary += " " + storedItem.Key + ": " + storedItem.Value + "/" + value;
+                foreach (KeyValuePair<Item.Type, int> storedItem in selectedMachine.storedItems)
+                {
+                    int value = 0;
+                    selectedMachineInfo.storageLimits.TryGetValue(storedItem.Key, out value);
+                    storedItemsSummary += " " + storedItem.Key + ": " + storedItem.Value + "/" + value;
+                }
             }
         }
         storedItems.text = storedItemsSummary;
-        money.text = GameGrid.Instance.money + "$";
+        money.text = GameApp.EcomoneyManager.Money + "$";
     }
 }

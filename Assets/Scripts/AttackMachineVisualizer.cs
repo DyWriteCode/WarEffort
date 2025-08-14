@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Peque.Machines
+namespace FactorySystem.Machines
 {
     public class AttackMachineVisualizer : MonoBehaviour
     {

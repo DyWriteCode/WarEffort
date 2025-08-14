@@ -3,7 +3,7 @@
 //using System.Linq;
 //using UnityEngine;
 
-//namespace Peque.Machines
+//namespace FactorySystem.Machines
 //{
 //    /// <summary>
 //    /// 伤害区域机器，定期对范围内的物品造成伤害
@@ -49,7 +49,7 @@
 //            List<System.Guid> itemsToDestroy = new List<System.Guid>();
 
 //            // 遍历所有物品
-//            foreach (var itemEntry in GameGrid.Instance.items)
+//            foreach (var itemEntry in GameGirdManager.Instance.items)
 //            {
 //                Item item = itemEntry.Value;
 //                // 计算物品与建筑的距离
@@ -84,10 +84,10 @@
 
 //            foreach (var itemId in itemsToDestroy)
 //            {
-//                GameGrid.Instance.SafeDestroyItem(itemId);
+//                GameGirdManager.Instance.SafeDestroyItem(itemId);
 //            }
 
-//            foreach (var machineEntry in GameGrid.Instance.machines.Values.ToList())
+//            foreach (var machineEntry in GameGirdManager.Instance.machines.Values.ToList())
 //            {
 //                if (machineEntry is Belt belt)
 //                {
@@ -106,7 +106,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Peque.Machines
+namespace FactorySystem.Machines
 {
     /// <summary>
     /// 伤害区域机器，定期对范围内的物品造成伤害
@@ -145,7 +145,7 @@ namespace Peque.Machines
             currentTick = 0; // 重置计数器
             // 根据伤害范围计算额外污染
             float areaPollution = damageRange * 0.1f;
-            GameGrid.Instance.AddPollution(areaPollution);
+            GameApp.PollutionManager.AddPollution(areaPollution);
             ApplyDamageToItemsInRange();
         }
 
@@ -158,7 +158,7 @@ namespace Peque.Machines
             Vector3 attackPosition = position; // 攻击机器的世界坐标
 
             // 遍历所有物品
-            foreach (var itemEntry in GameGrid.Instance.items.ToList())
+            foreach (var itemEntry in GameApp.ItemManager.Items.ToList())
             {
                 Item item = itemEntry.Value;
                 if (item == null || item.transform == null) continue;
@@ -192,14 +192,14 @@ namespace Peque.Machines
             foreach (var itemId in itemsToDestroy)
             {
                 //// 在销毁时计算污染
-                //if (GameGrid.Instance.items.TryGetValue(itemId, out Item item))
+                //if (GameGirdManager.Instance.items.TryGetValue(itemId, out Item item))
                 //{
-                //    float pollutionAmount = damagePerTick * GameGrid.Instance.GetItemInfo(item.type).pollutionFactor;
-                //    GameGrid.Instance.AddPollution(pollutionAmount);
-                //    Debug.Log(GameGrid.Instance.GetPollutionPercentage());
+                //    float pollutionAmount = damagePerTick * GameGirdManager.Instance.GetItemInfo(item.type).pollutionFactor;
+                //    GameGirdManager.Instance.AddPollution(pollutionAmount);
+                //    Debug.Log(GameGirdManager.Instance.GetPollutionPercentage());
                 //}
 
-                GameGrid.Instance.SafeDestroyItem(itemId);
+                GameApp.ItemManager.SafeDestroyItem(itemId);
             }
         }
 

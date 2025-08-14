@@ -1,5 +1,5 @@
-﻿using Peque;
-using Peque.Machines;
+﻿using FactorySystem;
+using FactorySystem.Machines;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -16,6 +16,8 @@ public class BuildPanel : MonoBehaviour
     private List<Vector3> currentBelt = new List<Vector3>();
     private MachineInfo selectedMachine;
     private bool isPlacing = false;
+
+    private Vector3 _placementStartPosition; // 记录放置开始位置
 
     private void Awake() {
         Instance = this;
@@ -42,9 +44,12 @@ public class BuildPanel : MonoBehaviour
                 previousMousePosition = hitInfo.point;
             }
 
-            if (selectedMachine.type == Machine.Type.Belt) {
+            if (selectedMachine.type == Machine.Type.Belt) 
+            {
                 placeBelt(hitInfo.point);
-            } else {
+            } 
+            else 
+            {
                 placeMachine(hitInfo.point);
             }
         } else if (Input.GetMouseButton(1) && gotHit) {
@@ -56,19 +61,25 @@ public class BuildPanel : MonoBehaviour
             validateBelt();
             isPlacing = false;
         }
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            // 记录放置开始位置
+            _placementStartPosition = Tools.GetMouseWorldPosition();
+        }
     }
 
     public void ShowMachineInfo (Machine.Type type) {
-        InfoPanel.Instance.setSelectedMachine(GameGrid.Instance.GetMachineInfo(type));
+        InfoPanel.Instance.setSelectedMachine(GameApp.MachineManager.GetMachineInfo(type));
     }
 
     private void moveSpacePreviewer (Vector3 position) {
-        Vector3 gridPosition = GameGrid.Instance.GetNearestPointOnGrid(position);
+        Vector3 gridPosition = GameApp.GameGridManager.GetNearestPointOnGrid(position);
         bool canPlaceIt = true;
 
         // machines may take multiple blocks, so we need to make sure all are available
-        foreach (Vector3 blockPosition in GameGrid.Instance.GetMachineBlocks(gridPosition, selectedMachine.type)) {
-            if (!GameGrid.Instance.IsPositionAvailable(blockPosition)) {
+        foreach (Vector3 blockPosition in GameApp.MachineManager.GetMachineBlocks(gridPosition, selectedMachine.type)) {
+            if (!GameApp.MachineManager.IsPositionOccupied(blockPosition)) {
                 canPlaceIt = false;
                 break;
             }
@@ -89,14 +100,14 @@ public class BuildPanel : MonoBehaviour
     }
 
     private void removeMachine(Vector3 clickPoint) {
-        Vector3 gridPosition = GameGrid.Instance.GetNearestPointOnGrid(clickPoint);
+        Vector3 gridPosition = GameApp.GameGridManager.GetNearestPointOnGrid(clickPoint);
 
         // avoid overlapping
-        if (GameGrid.Instance.IsPositionAvailable(gridPosition)) {
+        if (GameApp.MachineManager.IsPositionOccupied(gridPosition)) {
             return;
         }
 
-        GameGrid.Instance.GetMachineAt(gridPosition).Delete();
+        GameApp.MachineManager.GetMachineAt(gridPosition).Delete();
     }
 
     private void placeMachine (Vector3 clickPoint) {
@@ -107,12 +118,15 @@ public class BuildPanel : MonoBehaviour
             return;
         }
 
-        Vector3 gridPosition = GameGrid.Instance.GetNearestPointOnGrid(clickPoint);
+        Vector3 gridPosition = GameApp.GameGridManager.GetNearestPointOnGrid(clickPoint);
+        Machine machine = null;
 
-        // machines may take multiple blocks, so we need to make sure all are available
-        foreach (Vector3 blockPosition in GameGrid.Instance.GetMachineBlocks(gridPosition, selectedMachine.type)) {
-            // avoid overlapping
-            if (gridPosition.y > 0.5f || !GameGrid.Instance.IsPositionAvailable(blockPosition)) {
+        // 机器可能需要多个块，因此我们需要确保所有块都可用
+        foreach (Vector3 blockPosition in GameApp.MachineManager.GetMachineBlocks(gridPosition, selectedMachine.type)) 
+        {
+            // 避免重叠
+            if (gridPosition.y > 0.5f || !GameApp.MachineManager.IsPositionOccupied(blockPosition, selectedMachine.type)) 
+            {
                 previousMousePosition = gridPosition;
                 return;
             }
@@ -121,8 +135,19 @@ public class BuildPanel : MonoBehaviour
         GameObject obj = Instantiate(selectedMachine.prefab, getPlacingPosition(gridPosition), Quaternion.identity);
         //GameObject obj = Instantiate(selectedMachine.prefab, gridPosition, Quaternion.identity);
         obj.name = gridPosition.ToString();
-        Machine machine = null;
-        // 根据类型创建不同的机器实例
+
+        //Vector3 currentPosition = Tools.GetMouseWorldPosition();
+        //Machine.Direction direction = DirectionHelper.GetDirectionFromMouseMovement(
+        //    _placementStartPosition,
+        //    currentPosition
+        //);
+
+        //// 创建机器
+        //Machine machine = GameApp.MachineManager.CreateAndPlaceMachine(
+        //    selectedMachine.type,
+        //    currentPosition,
+        //    direction
+        //);
         if (selectedMachine.type == Machine.Type.AttackMachine)
         {
             machine = new AttackMachine(obj);
@@ -135,7 +160,7 @@ public class BuildPanel : MonoBehaviour
         {
             machine = new Machine(obj, selectedMachine.type, gridPosition);
         }
-        GameGrid.Instance.PlaceMachine(machine);
+        GameApp.MachineManager.PlaceMachine(machine);
     }
 
     private void placeBelt(Vector3 clickPoint) {
@@ -146,19 +171,20 @@ public class BuildPanel : MonoBehaviour
             return;
         }
 
-        Vector3 finalPosition = GameGrid.Instance.GetNearestPointOnGrid(clickPoint);
+        Vector3 finalPosition = GameApp.GameGridManager.GetNearestPointOnGrid(clickPoint);
 
         // avoid overlapping
-        if (finalPosition.y > 0.5f || !GameGrid.Instance.IsPositionAvailable(finalPosition)) {
+        if (finalPosition.y > 0.5f || !GameApp.MachineManager.IsPositionOccupied(finalPosition)) {
             // seems like he's trying to link existing belts
             if (previousMousePosition != finalPosition &&
-                !GameGrid.Instance.IsPositionAvailable(previousMousePosition) &&
-                GameGrid.Instance.GetMachineAt(finalPosition) != GameGrid.Instance.GetMachineAt(previousMousePosition)
-                //GameGrid.Instance.GetMachineAt(previousMousePosition).type == Machine.Type.Belt &&
-                //GameGrid.Instance.GetMachineAt(finalPosition).type == Machine.Type.Belt
-                ) {
-                GameGrid.Instance.GetMachineAt(finalPosition).AddConnection(previousMousePosition, Machine.ConnectionType.Input);
-                GameGrid.Instance.GetMachineAt(previousMousePosition).AddConnection(finalPosition, Machine.ConnectionType.Output);
+                !GameApp.MachineManager.IsPositionOccupied(previousMousePosition) &&
+                GameApp.MachineManager.GetMachineAt(finalPosition) != GameApp.MachineManager.GetMachineAt(previousMousePosition)
+                //GameGirdManager.Instance.GetMachineAt(previousMousePosition).type == Machine.Type.Belt &&
+                //GameGirdManager.Instance.GetMachineAt(finalPosition).type == Machine.Type.Belt
+                ) 
+            {
+                GameApp.MachineManager.GetMachineAt(finalPosition).AddConnection(previousMousePosition, Machine.ConnectionType.Input);
+                GameApp.MachineManager.GetMachineAt(previousMousePosition).AddConnection(finalPosition, Machine.ConnectionType.Output);
             }
             previousMousePosition = finalPosition;
             return;
@@ -185,37 +211,41 @@ public class BuildPanel : MonoBehaviour
         machine.direction = direction;
 
         // if player started dragging from an existing conveyor belt, link it to the new one
-        if (previousMousePosition != Vector3.zero && 
-            !currentBelt.Contains(previousMousePosition) && 
-            !GameGrid.Instance.IsPositionAvailable(previousMousePosition) && 
-            GameGrid.Instance.GetMachineAt(previousMousePosition).type == Machine.Type.Belt) {
-            if (currentBelt.Count > 0) {
-                validatePreviousBlockDirection(GameGrid.Instance.GetMachineAt(currentBelt.Last()), GameGrid.Instance.GetMachineAt(previousMousePosition));
+        if (GameApp.MachineManager.GetMachineAt(previousMousePosition) != null)
+        {
+            if (previousMousePosition != Vector3.zero &&
+            !currentBelt.Contains(previousMousePosition) &&
+            !GameApp.MachineManager.IsPositionOccupied(previousMousePosition) &&
+            GameApp.MachineManager.GetMachineAt(previousMousePosition).type == Machine.Type.Belt)
+            {
+                if (currentBelt.Count > 0)
+                {
+                    validatePreviousBlockDirection(GameApp.MachineManager.GetMachineAt(currentBelt.Last()), GameApp.MachineManager.GetMachineAt(previousMousePosition));
 
-                GameGrid.Instance.GetMachineAt(currentBelt.Last()).AddConnection(previousMousePosition, Machine.ConnectionType.Output);
-                GameGrid.Instance.GetMachineAt(previousMousePosition).AddConnection(currentBelt.Last(), Machine.ConnectionType.Input);
+                    GameApp.MachineManager.GetMachineAt(currentBelt.Last()).AddConnection(previousMousePosition, Machine.ConnectionType.Output);
+                    GameApp.MachineManager.GetMachineAt(previousMousePosition).AddConnection(currentBelt.Last(), Machine.ConnectionType.Input);
+                }
+                currentBelt.Add(previousMousePosition);
             }
-            currentBelt.Add(previousMousePosition);
         }
-
-        GameGrid.Instance.PlaceMachine(machine);
+        GameApp.MachineManager.PlaceMachine(machine);;
 
         Belt lastMachine = null;
 
         if (currentBelt.Count > 0) {
-            lastMachine = (Belt)GameGrid.Instance.machines[currentBelt.Last()];
+            lastMachine = (Belt)GameApp.MachineManager.GetMachineAt(currentBelt.Last());
 
             // new item and latest one are not neighbors
-            if (!GameGrid.Instance.GetNeighbors(finalPosition).Contains(lastMachine.position)) {
-                var lastItemNeighbors = GameGrid.Instance.GetNeighbors(lastMachine.position);
+            if (!GameApp.MachineManager.GetNeighbors(finalPosition).Contains(lastMachine.position)) {
+                var lastItemNeighbors = GameApp.MachineManager.GetNeighbors(lastMachine.position);
 
                 // find a common available neighbor to create the union
-                foreach (Vector3 pos in GameGrid.Instance.GetNeighbors(finalPosition)) {
-                    if (lastItemNeighbors.Contains(pos) && GameGrid.Instance.IsPositionAvailable(pos)) {
+                foreach (Vector3 pos in GameApp.MachineManager.GetNeighbors(finalPosition)) {
+                    if (lastItemNeighbors.Contains(pos) && GameApp.MachineManager.IsPositionOccupied(pos)) {
                         placeBelt(pos);
 
                         // refresh last item
-                        lastMachine = (Belt)GameGrid.Instance.machines[currentBelt.Last()];
+                        lastMachine = (Belt)GameApp.MachineManager.GetMachineAt(currentBelt.Last());
                         break;
                     }
                 }
@@ -228,8 +258,8 @@ public class BuildPanel : MonoBehaviour
             validatePreviousBlockDirection(lastMachine, machine);
 
             // connect them
-            GameGrid.Instance.GetMachineAt(lastMachine.position).AddConnection(finalPosition, Machine.ConnectionType.Output);
-            GameGrid.Instance.GetMachineAt(finalPosition).AddConnection(lastMachine.position, Machine.ConnectionType.Input);
+            GameApp.MachineManager.GetMachineAt(lastMachine.position).AddConnection(finalPosition, Machine.ConnectionType.Output);
+            GameApp.MachineManager.GetMachineAt(finalPosition).AddConnection(lastMachine.position, Machine.ConnectionType.Input);
         }
 
         previousMousePosition = finalPosition;
@@ -242,17 +272,17 @@ public class BuildPanel : MonoBehaviour
             Machine.Direction newDirection = (previousMachine.position.x > nextMachine.position.x) ? Machine.Direction.Left : Machine.Direction.Right;
 
             newRotation.y = (float)newDirection;
-            GameGrid.Instance.GetMachineAt(previousMachine.position).gameObject.transform.rotation = Quaternion.Euler(newRotation);
-            GameGrid.Instance.GetMachineAt(previousMachine.position).direction = newDirection;
+            GameApp.MachineManager.GetMachineAt(previousMachine.position).gameObject.transform.rotation = Quaternion.Euler(newRotation);
+            GameApp.MachineManager.GetMachineAt(previousMachine.position).direction = newDirection;
 
         } else if (previousMachine.position.x == nextMachine.position.x && previousMachine.direction != nextMachine.direction) { // vertical relation :
-            GameGrid.Instance.GetMachineAt(previousMachine.position).gameObject.transform.rotation = nextMachine.gameObject.transform.rotation;
-            GameGrid.Instance.GetMachineAt(previousMachine.position).direction = nextMachine.direction;
+            GameApp.MachineManager.GetMachineAt(previousMachine.position).gameObject.transform.rotation = nextMachine.gameObject.transform.rotation;
+            GameApp.MachineManager.GetMachineAt(previousMachine.position).direction = nextMachine.direction;
         }
     }
 
     public void SelectMachine(Machine.Type type) {
-        selectedMachine = GameGrid.Instance.GetMachineInfo(type);
+        selectedMachine = GameApp.MachineManager.GetMachineInfo(type);
         showSpacePreviewer();
     }
 
@@ -270,7 +300,7 @@ public class BuildPanel : MonoBehaviour
     private bool CanAffordMachine()
     {
         return selectedMachine != null &&
-               GameGrid.Instance.money >= selectedMachine.price;
+               GameApp.EcomoneyManager.CanAfford(selectedMachine.price);
     }
 
 }
