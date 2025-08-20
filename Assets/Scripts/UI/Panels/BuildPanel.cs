@@ -24,7 +24,8 @@ public class BuildPanel : MonoBehaviour
     }
 
     private void Update() {
-        if (selectedMachine == null) {
+        if (selectedMachine == null) 
+        {
             return;
         }
         RaycastHit hitInfo;
@@ -125,7 +126,7 @@ public class BuildPanel : MonoBehaviour
         foreach (Vector3 blockPosition in GameApp.MachineManager.GetMachineBlocks(gridPosition, selectedMachine.type)) 
         {
             // 避免重叠
-            if (gridPosition.y > 0.5f || !GameApp.MachineManager.IsPositionOccupied(blockPosition, selectedMachine.type)) 
+            if (gridPosition.y > 0.5f || !GameApp.MachineManager.IsPositionOccupied(blockPosition)) 
             {
                 previousMousePosition = gridPosition;
                 return;
@@ -183,16 +184,41 @@ public class BuildPanel : MonoBehaviour
                 //GameGirdManager.Instance.GetMachineAt(finalPosition).type == Machine.Type.Belt
                 ) 
             {
-                GameApp.MachineManager.GetMachineAt(finalPosition).AddConnection(previousMousePosition, Machine.ConnectionType.Input);
-                GameApp.MachineManager.GetMachineAt(previousMousePosition).AddConnection(finalPosition, Machine.ConnectionType.Output);
+                try
+                {
+                    GameApp.MachineManager.GetMachineAt(finalPosition).AddConnection(previousMousePosition, Machine.ConnectionType.Input);
+                    GameApp.MachineManager.GetMachineAt(previousMousePosition).AddConnection(finalPosition, Machine.ConnectionType.Output);
+                }
+                catch
+                {
+                    Debug.LogWarning(finalPosition);
+                    Debug.LogWarning(previousMousePosition);
+                }
             }
             previousMousePosition = finalPosition;
             return;
         }
 
         Vector3 mouseDirection = finalPosition - previousMousePosition;
-        Vector3 itemDirection = Vector3.zero;
         Machine.Direction direction = Machine.Direction.Right;
+
+        if (Mathf.Abs(mouseDirection.x) > Mathf.Abs(mouseDirection.z))
+        {
+            direction = mouseDirection.x > 0
+                ? Machine.Direction.Right
+                : Machine.Direction.Left;
+        }
+        else
+        {
+            direction = mouseDirection.z > 0
+                ? Machine.Direction.Up
+                : Machine.Direction.Down;
+        }
+
+
+        //Vector3 mouseDirection = finalPosition - previousMousePosition;
+        //Machine.Direction direction = Machine.Direction.Right;
+        Vector3 itemDirection = Vector3.zero;
 
         if (mouseDirection.x < 0) {
             itemDirection.y = (float)Machine.Direction.Left;

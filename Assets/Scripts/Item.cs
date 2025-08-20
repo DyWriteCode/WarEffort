@@ -28,8 +28,10 @@ namespace FactorySystem
         public int maxHp = 100;
         public GameObject healthBar; // 关联的血条对象
 
-        public ItemInfo info {
-            get {
+        public ItemInfo Info 
+        {
+            get 
+            {
                 return GameApp.ItemManager.GetItemInfo(type);
             }
         }

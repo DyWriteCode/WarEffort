@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DG.Tweening;
 using FactorySystem;
 using FactorySystem.Machines;
 using UnityEngine;
@@ -64,7 +65,7 @@ public class ItemManager : BaseManager
     /// <summary>
     /// 创建新物品
     /// </summary>
-    public Item CreateItem(Item.Type type, Vector3 position, Vector3 parent)
+    public Item CreateItem(Item.Type type, Vector3 position, Vector3 parent, int maxHp, int hp)
     {
         Item item = new Item
         {
@@ -72,8 +73,8 @@ public class ItemManager : BaseManager
             type = type,
             position = position,
             parent = parent,
-            maxHp = 100, // 默认值，可根据物品信息扩展
-            Hp = 100
+            maxHp = maxHp, // 默认值，可根据物品信息扩展
+            Hp = hp
         };
 
         // 添加到全局系统
@@ -147,6 +148,57 @@ public class ItemManager : BaseManager
             ItemsToMove.Enqueue(id);
         }
     }
+
+    /// <summary>
+    /// 移动待处理的物品
+    /// </summary>
+    private void MovePendingItems()
+    {
+        // 创建临时队列避免修改正在迭代的集合
+        var processingQueue = new Queue<System.Guid>(ItemsToMove);
+        ItemsToMove.Clear();
+
+        while (processingQueue.Count > 0)
+        {
+            System.Guid id = processingQueue.Dequeue();
+            if (!Items.TryGetValue(id, out Item item)) continue;
+
+            MoveItemToParent(item);
+        }
+    }
+
+    /// <summary>
+    /// 将物品移动到其父机器
+    /// </summary>
+    private void MoveItemToParent(Item item)
+    {
+        // 验证父机器
+        if (!GameApp.MachineManager.GridOccupancy.TryGetValue(item.parent, out Vector3 machinePosition))
+        {
+            Debug.LogWarning($"物品的父位置无效: {item.parent}");
+            return;
+        }
+
+        Machine parentMachine = GameApp.MachineManager.GetMachineAt(machinePosition);
+
+        if (parentMachine == null || parentMachine.gameObject == null)
+        {
+            Debug.LogWarning($"父机器游戏对象无效: {machinePosition}");
+            return;
+        }
+
+        // 安全设置父对象和位置
+        try
+        {
+            item.transform.SetParent(parentMachine.gameObject.transform, false);
+            item.transform.DOLocalMove(item.position, 0.01f, false);
+            // item.transform.localPosition = item.position;
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"移动物品时出错: {e.Message}");
+        }
+    }
     #endregion
 
     #region Batch Operations
@@ -167,6 +219,13 @@ public class ItemManager : BaseManager
         // 重置队列
         ItemsToCreate.Clear();
         ItemsToMove.Clear();
+    }
+    #endregion
+
+    #region Life Cycle
+    public override void Update()
+    {
+        MovePendingItems();
     }
     #endregion
 }

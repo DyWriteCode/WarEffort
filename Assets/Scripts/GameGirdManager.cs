@@ -437,119 +437,6 @@ namespace FactorySystem
         }
         #endregion
 
-        // item manager
-        #region Item Management
-        ///// <summary>
-        ///// 创建待生成的物品
-        ///// </summary>
-        //private void CreatePendingItems()
-        //{
-        //    while (itemsToCreate.Count > 0)
-        //    {
-        //        System.Guid id = itemsToCreate.Dequeue();
-        //        if (!items.TryGetValue(id, out Item item)) continue;
-
-        //        CreateItemInstance(item);
-        //    }
-        //}
-
-        ///// <summary>
-        ///// 实例化物品游戏对象
-        ///// </summary>
-        //private void CreateItemInstance(Item item)
-        //{
-        //    // 获取父机器
-        //    Machine parentMachine = GetMachineAt(item.parent);
-        //    if (parentMachine == null || parentMachine.gameObject == null) return;
-
-        //    // 实例化物品
-        //    GameObject obj = Instantiate(
-        //        item.info.prefab,
-        //        item.position,
-        //        Quaternion.Euler(-90, 0, 0),
-        //        parentMachine.gameObject.transform
-        //    );
-
-        //    item.transform = obj.transform;
-
-        //    // 创建血条
-        //    if (healthBarPrefab != null)
-        //    {
-        //        healthBarManager.CreateHealthBarForItem(item, obj.transform);
-        //    }
-
-        //    // 添加物品碰撞组件
-        //    ItemObject itemObject = obj.AddComponent<ItemObject>();
-        //    itemObject.item = item;
-        //}
-
-        ///// <summary>
-        ///// 移动待处理的物品
-        ///// </summary>
-        //private void MovePendingItems()
-        //{
-        //    // 创建临时队列避免修改正在迭代的集合
-        //    var processingQueue = new Queue<System.Guid>(itemsToMove);
-        //    itemsToMove.Clear();
-
-        //    while (processingQueue.Count > 0)
-        //    {
-        //        System.Guid id = processingQueue.Dequeue();
-        //        if (!items.TryGetValue(id, out Item item)) continue;
-
-        //        MoveItemToParent(item);
-        //    }
-        //}
-
-        ///// <summary>
-        ///// 将物品移动到其父机器
-        ///// </summary>
-        //private void MoveItemToParent(Item item)
-        //{
-        //    // 验证父机器
-        //    if (!gridOccupancy.TryGetValue(item.parent, out Vector3 machinePosition))
-        //    {
-        //        Debug.LogWarning($"物品的父位置无效: {item.parent}");
-        //        return;
-        //    }
-
-        //    if (!machines.TryGetValue(machinePosition, out Machine parentMachine))
-        //    {
-        //        Debug.LogWarning($"父机器不存在: {machinePosition}");
-        //        return;
-        //    }
-
-        //    if (parentMachine == null || parentMachine.gameObject == null)
-        //    {
-        //        Debug.LogWarning($"父机器游戏对象无效: {machinePosition}");
-        //        return;
-        //    }
-
-        //    // 安全设置父对象和位置
-        //    try
-        //    {
-        //        item.transform.SetParent(parentMachine.gameObject.transform, false);
-        //        item.transform.localPosition = item.position;
-        //    }
-        //    catch (System.Exception e)
-        //    {
-        //        Debug.LogError($"移动物品时出错: {e.Message}");
-        //    }
-        //}
-
-        ///// <summary>
-        ///// 请求移动物品到新位置
-        ///// </summary>
-        //public void RequestItemMove(System.Guid id, Vector3 position)
-        //{
-        //    if (items.TryGetValue(id, out Item item))
-        //    {
-        //        item.position = position;
-        //        itemsToMove.Enqueue(id);
-        //    }
-        //}
-        #endregion
-
         #region Machine Execution
         /// <summary>
         /// 处理传送带移动（目前为空，保留结构）
@@ -564,25 +451,52 @@ namespace FactorySystem
         /// <summary>
         /// 获取网格上最近的点
         /// </summary>
+        //public Vector3 GetNearestPointOnGrid(Vector3 position)
+        //{
+        //    if (parentObject == null)
+        //    {
+        //        Debug.LogError("no parentObject");
+        //        return new Vector3();
+        //    };
+        //    position.y = 0.3f;
+        //    position -= parentObject.transform.position;
+
+        //    int xCount = Mathf.RoundToInt(position.x / gridSize);
+        //    int zCount = Mathf.RoundToInt(position.z / gridSize);
+
+        //    Vector3 result = new Vector3(
+        //        xCount * gridSize,
+        //        0,
+        //        zCount * gridSize);
+
+        //    return result + parentObject.transform.position;
+        //}
+
         public Vector3 GetNearestPointOnGrid(Vector3 position)
         {
             if (parentObject == null)
             {
                 Debug.LogError("no parentObject");
-                return new Vector3();
-            };
+                return position;
+            }
+
             position.y = 0.3f;
-            position -= parentObject.transform.position;
 
-            int xCount = Mathf.RoundToInt(position.x / gridSize);
-            int zCount = Mathf.RoundToInt(position.z / gridSize);
+            // 计算相对于父对象的位置
+            Vector3 localPos = position - parentObject.transform.position;
 
-            Vector3 result = new Vector3(
+            // 计算网格索引
+            int xCount = Mathf.RoundToInt(localPos.x / gridSize);
+            int zCount = Mathf.RoundToInt(localPos.z / gridSize);
+
+            // 计算网格中心位置（世界坐标）
+            Vector3 gridCenter = new Vector3(
                 xCount * gridSize,
                 0,
-                zCount * gridSize);
+                zCount * gridSize
+            ) + parentObject.transform.position;
 
-            return result + parentObject.transform.position;
+            return gridCenter;
         }
         #endregion
 

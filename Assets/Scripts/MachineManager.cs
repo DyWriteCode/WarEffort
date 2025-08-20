@@ -24,6 +24,8 @@ namespace FactorySystem
         public enum Position { Top = 1, Left = 2, Bottom = 3, Right = 4 }
 
         private MachineFactory _machineFactory;
+
+        public Dictionary<Vector3, Vector3> GridOccupancy => _gridOccupancy;
         #endregion
 
         #region Init
@@ -234,9 +236,11 @@ namespace FactorySystem
         /// <summary>
         /// 获取指定位置的机器
         /// </summary>
-        public Machine GetMachineAt(Vector3 position)
+        public Machine GetMachineAt(Vector3 pos)
         {
-            return _machines.TryGetValue(position, out Machine machine) ? machine : null;
+            return _gridOccupancy.TryGetValue(pos, out Vector3 machinePos)
+                ? _machines.TryGetValue(machinePos, out Machine machine) ? machine : null
+                : null;
         }
 
         /// <summary>

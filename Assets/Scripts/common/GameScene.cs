@@ -55,7 +55,7 @@ namespace FactorySystem
         }
         void Start()
         {
-            Cursor.SetCursor(MouseIcon, Vector2.zero, CursorMode.Auto);
+            Cursor.SetCursor(MouseIcon, Vector3.zero, CursorMode.Auto);
             RegisterConfigs();
             GameApp.ConfigManager.LoadAllConfigs();
             RegisterModule();

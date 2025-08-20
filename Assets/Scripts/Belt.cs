@@ -303,6 +303,11 @@ namespace FactorySystem.Machines
         };
 
         /// <summary>
+        /// 进度跟踪字典
+        /// </summary>
+        private Dictionary<System.Guid, float> itemProgress = new Dictionary<System.Guid, float>();
+
+        /// <summary>
         /// 检查传送带是否有空闲槽位（位置1是否空闲）
         /// </summary>
         public bool hasFreeSlots => !itemPositions.ContainsKey(1);
@@ -315,7 +320,7 @@ namespace FactorySystem.Machines
         /// 在传送带上添加新物品
         /// </summary>
         /// <param name="type">物品类型</param>
-        public void addItem(Item.Type type)
+        public void addItem(Item.Type type, List<System.Object> normalObjects = null, List<UnityEngine.Object> unityObjects = null)
         {
             // 检查是否有空闲槽位
             if (!hasFreeSlots)
@@ -328,17 +333,7 @@ namespace FactorySystem.Machines
             Vector3 spawnPos = position;
             spawnPos.y = 1;  // 确保物品在传送带上方
 
-            Item item = new Item
-            {
-                id = System.Guid.NewGuid(),
-                type = type,
-                position = spawnPos,
-                parent = position
-            };
-
-            // 添加到全局物品系统
-            GameApp.ItemManager.Items.Add(item.id, item);
-            GameApp.ItemManager.ItemsToCreate.Enqueue(item.id);
+            Item item = GameApp.ItemManager.CreateItem(type, spawnPos, position, 100, 100);
 
             // 实例化物品游戏对象
             GameObject obj = GameObject.Instantiate(
@@ -348,7 +343,17 @@ namespace FactorySystem.Machines
                 gameObject.transform
             );
 
+            // 创建血条
+            if (GameApp.HealthManager.healthBarPrefab != null)
+            {
+                GameApp.HealthManager.CreateHealthBarForItem(item, obj.transform);
+            }
+
             item.transform = obj.transform;
+
+            // 添加物品碰撞组件
+            ItemObject itemObject = obj.AddComponent<ItemObject>();
+            itemObject.item = item;
 
             // 将物品添加到传送带系统
             addToItems(item.id, type);
@@ -366,6 +371,9 @@ namespace FactorySystem.Machines
 
             // 将物品放置在第1个槽位
             itemPositions.Add(1, itemId);
+
+            // 初始化物品进度
+            itemProgress[itemId] = 0f;
 
             // 更新物品父对象和位置
             GameApp.ItemManager.Items[itemId].parent = position;
@@ -392,7 +400,10 @@ namespace FactorySystem.Machines
             ProcessExitPositionItem();
 
             // 移动传送带上的物品
-            MoveItemsOnBelt();
+            // MoveItemsOnBelt();
+
+            // 移动传送带上的物品（基于速度）
+            MoveItemsOnBeltWithSpeed();
         }
 
         /// <summary>
@@ -530,6 +541,11 @@ namespace FactorySystem.Machines
                 items.Remove(itemId);
             }
 
+            if (itemProgress.ContainsKey(itemId))
+            {
+                itemProgress.Remove(itemId);
+            }
+
             // 从位置字典移除
             var positionEntry = itemPositions.FirstOrDefault(p => p.Value == itemId);
             if (positionEntry.Key != 0)
@@ -566,6 +582,54 @@ namespace FactorySystem.Machines
         }
 
         /// <summary>
+        /// 基于速度移动传送带上的物品
+        /// </summary>
+        private void MoveItemsOnBeltWithSpeed()
+        {
+            // 获取时间增量（秒）
+            float deltaTime = Time.deltaTime;
+
+            // 从后往前处理物品（避免覆盖）
+            for (int slot = 4; slot >= 1; slot--)
+            {
+                if (itemPositions.TryGetValue(slot, out System.Guid itemId))
+                {
+                    Item item = GameApp.ItemManager.Items[itemId];
+
+                    // 计算基于速度的进度增量
+                    float progressIncrement = item.Info.MoveSpeed * deltaTime * 5;
+                    itemProgress[itemId] += progressIncrement;
+
+                    // 当进度达到1时，尝试移动到下一个槽位
+                    if (itemProgress[itemId] >= 1f)
+                    {
+                        TryMoveItemWithSpeed(itemId, slot, slot + 1);
+                        itemProgress[itemId] = 0f; // 重置进度
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 尝试将物品移动到下一个槽位
+        /// </summary>
+        private void TryMoveItemWithSpeed(System.Guid itemId, int currentSlot, int targetSlot)
+        {
+            // 检查目标槽位是否有效且为空
+            if (targetSlot > 4 || itemPositions.ContainsKey(targetSlot))
+            {
+                return;
+            }
+
+            // 更新物品位置
+            GameApp.ItemManager.RequestItemMove(itemId, positions[targetSlot]);
+
+            // 更新槽位映射
+            itemPositions.Remove(currentSlot);
+            itemPositions.Add(targetSlot, itemId);
+        }
+
+        /// <summary>
         /// 尝试将物品从一个槽位移动到另一个槽位
         /// </summary>
         /// <param name="fromSlot">源槽位</param>
@@ -576,7 +640,6 @@ namespace FactorySystem.Machines
             if (itemPositions.ContainsKey(fromSlot) && !itemPositions.ContainsKey(toSlot))
             {
                 System.Guid itemId = itemPositions[fromSlot];
-
                 // 更新物品位置
                 GameApp.ItemManager.RequestItemMove(itemId, positions[toSlot]);
 

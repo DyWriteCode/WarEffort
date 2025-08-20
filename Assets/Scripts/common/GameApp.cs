@@ -54,5 +54,6 @@ public class GameApp : Singleton<GameApp>
         TimerManager.Update(dt);
         GameGridManager.Update();
         MachineManager.Update();
+        ItemManager.Update();
     }
 }
