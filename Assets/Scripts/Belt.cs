@@ -280,6 +280,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace FactorySystem.Machines
 {
@@ -295,7 +296,8 @@ namespace FactorySystem.Machines
         public Dictionary<int, System.Guid> itemPositions = new Dictionary<int, System.Guid>();
 
         // 槽位位置映射：槽位ID -> 局部位置（相对于传送带）
-        public Dictionary<int, Vector3> positions = new Dictionary<int, Vector3>() {
+        public Dictionary<int, Vector3> positions = new Dictionary<int, Vector3>() 
+        {
             {1, new Vector3(-0.458f, 1, 0)},  // 入口位置（最左端）
             {2, new Vector3(-0.151f, 1, 0)},   // 中间位置1
             {3, new Vector3(0.194f, 1, 0)},    // 中间位置2
@@ -306,6 +308,12 @@ namespace FactorySystem.Machines
         /// 进度跟踪字典
         /// </summary>
         private Dictionary<System.Guid, float> itemProgress = new Dictionary<System.Guid, float>();
+        private Dictionary<System.Guid, Vector3> itemStartPositions = new Dictionary<System.Guid, Vector3>();
+        private Dictionary<System.Guid, Vector3> itemTargetPositions = new Dictionary<System.Guid, Vector3>();
+        private Dictionary<System.Guid, float> itemMoveStartTimes = new Dictionary<System.Guid, float>();
+        private Dictionary<System.Guid, float> itemSpeedVariations = new Dictionary<System.Guid, float>();
+        private Dictionary<System.Guid, float> itemMoveTimers = new Dictionary<System.Guid, float>();
+
 
         /// <summary>
         /// 检查传送带是否有空闲槽位（位置1是否空闲）
@@ -375,6 +383,9 @@ namespace FactorySystem.Machines
             // 初始化物品进度
             itemProgress[itemId] = 0f;
 
+            float speedVariation = Random.Range(0.9f, 1.1f);
+            itemSpeedVariations[itemId] = speedVariation;
+
             // 更新物品父对象和位置
             GameApp.ItemManager.Items[itemId].parent = position;
             GameApp.ItemManager.Items[itemId].position = positions[1];
@@ -403,7 +414,10 @@ namespace FactorySystem.Machines
             // MoveItemsOnBelt();
 
             // 移动传送带上的物品（基于速度）
-            MoveItemsOnBeltWithSpeed();
+            // MoveItemsOnBeltWithSpeed();
+
+            // 平滑移动
+            MoveItemsSmoothly();
         }
 
         /// <summary>
@@ -412,7 +426,9 @@ namespace FactorySystem.Machines
         private void ProcessExitPositionItem()
         {
             if (!itemPositions.TryGetValue(4, out System.Guid itemId))
+            {
                 return;
+            }
 
             Item.Type itemType = items[itemId];
             bool itemProcessed = false;
@@ -422,11 +438,15 @@ namespace FactorySystem.Machines
             {
                 // 跳过输入连接
                 if (connection.Value == ConnectionType.Input)
+                {
                     continue;
+                }
 
                 Machine neighborMachine = GameApp.MachineManager.GetMachineAt(connection.Key);
                 if (neighborMachine == null)
+                {
                     continue;
+                }
 
                 // 连接到另一条传送带
                 if (neighborMachine.type == Type.Belt)
@@ -465,7 +485,9 @@ namespace FactorySystem.Machines
         {
             Belt belt = (Belt)neighborMachine;
             if (!belt.hasFreeSlots)
+            {
                 return false;
+            }
 
             try
             {
@@ -607,6 +629,106 @@ namespace FactorySystem.Machines
                         itemProgress[itemId] = 0f; // 重置进度
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// 平滑移动传送带上的物品
+        /// </summary>
+        private void MoveItemsSmoothly()
+        {
+            float deltaTime = Time.deltaTime;
+
+            // 处理每个槽位的物品移动
+            for (int slot = 1; slot <= 4; slot++)
+            {
+                if (!itemPositions.TryGetValue(slot, out System.Guid itemId))
+                {
+                    continue;
+                }
+
+                if (!GameApp.ItemManager.Items.TryGetValue(itemId, out Item item))
+                {
+                    continue;
+                }
+
+                // 如果物品正在移动中，更新移动进度
+                if (itemMoveTimers.ContainsKey(itemId))
+                {
+                    itemMoveTimers[itemId] += deltaTime * item.Info.MoveSpeed * itemSpeedVariations[itemId] * 2;
+                    float progress = Mathf.Clamp01(itemMoveTimers[itemId]);
+
+                    // 使用平滑的插值函数（如EaseOut）
+                    float smoothProgress = SmoothStep(progress);
+
+                    // 计算当前位置
+                    Vector3 currentPos = Vector3.Lerp(
+                        itemStartPositions[itemId],
+                        itemTargetPositions[itemId],
+                        smoothProgress
+                    );
+
+                    // 更新物品位置
+                    item.transform.localPosition = currentPos;
+
+                    // 移动完成
+                    if (progress >= 1f)
+                    {
+                        CompleteItemMove(itemId, slot);
+                    }
+                }
+                else if (slot < 4 && !itemPositions.ContainsKey(slot + 1))
+                {
+                    // 准备移动到下一个槽位
+                    PrepareItemMove(itemId, slot, slot + 1);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 平滑步进函数（替代Mathf.SmoothStep以获得更多控制）
+        /// </summary>
+        private float SmoothStep(float t)
+        {
+            // 使用二次缓出函数，使移动末尾减速
+            return 1f - (1f - t) * (1f - t);
+        }
+
+        /// <summary>
+        /// 准备物品移动
+        /// </summary>
+        private void PrepareItemMove(System.Guid itemId, int currentSlot, int targetSlot)
+        {
+            if (!GameApp.ItemManager.Items.TryGetValue(itemId, out Item item))
+            {
+                return;
+            }
+
+            itemStartPositions[itemId] = positions[currentSlot];
+            itemTargetPositions[itemId] = positions[targetSlot];
+            itemMoveTimers[itemId] = 0f;
+        }
+
+        /// <summary>
+        /// 完成物品移动
+        /// </summary>
+        private void CompleteItemMove(System.Guid itemId, int currentSlot)
+        {
+            // 更新槽位映射
+            int targetSlot = currentSlot + 1;
+            itemPositions.Remove(currentSlot);
+            itemPositions.Add(targetSlot, itemId);
+
+            // 清理移动数据
+            itemStartPositions.Remove(itemId);
+            itemTargetPositions.Remove(itemId);
+            itemMoveTimers.Remove(itemId);
+
+            // 确保物品精确到达目标位置
+            if (GameApp.ItemManager.Items.TryGetValue(itemId, out Item item))
+            {
+                item.transform.localPosition = positions[targetSlot];
+                item.position = positions[targetSlot];
             }
         }
 
