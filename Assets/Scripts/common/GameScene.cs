@@ -6,21 +6,32 @@ namespace FactorySystem
 {
     public class GameScene : MonoBehaviour
     {
+        public bool NoUseConfigurationTable = true;
+
         [Header("Game Settings")]
+        [BoolConditionalHide(nameof(NoUseConfigurationTable))]
         public float InitialMoney = 10000;
+        [BoolConditionalHide(nameof(NoUseConfigurationTable))]
         public Texture2D MouseIcon;
+        [BoolConditionalHide(nameof(NoUseConfigurationTable))]
         public Material BeltMaterial;
 
         [Header("Game Object")]
+        [BoolConditionalHide(nameof(NoUseConfigurationTable))]
         public GameObject HealthBarPrefab;
 
         [Header("Data Assets")]
+        [BoolConditionalHide(nameof(NoUseConfigurationTable))]
         public MachineInfo[] MachinesInfo;
+        [BoolConditionalHide(nameof(NoUseConfigurationTable))]
         public ItemInfo[] ItemsInfo;
 
         [Header("Pollution System")]
+        [BoolConditionalHide(nameof(NoUseConfigurationTable))]
         public float GlobalPollution = 0;
+        [BoolConditionalHide(nameof(NoUseConfigurationTable))]
         public float MaxPollution = 0;
+        [BoolConditionalHide(nameof(NoUseConfigurationTable))]
         public float PollutionWarningThreshold = 0;
 
         private float dt;

@@ -146,9 +146,9 @@ namespace FactorySystem
                 _gridOccupancy[blockPos] = machine.position;
             }
 
-            if (GameApp.EcomoneyManager.CanAfford(machine.info.price)) 
+            if (GameApp.EcomoneyManager.CanAfford(machine.Info.price)) 
             {
-                GameApp.EcomoneyManager.SpendMoney(machine.info.price);
+                GameApp.EcomoneyManager.SpendMoney(machine.Info.price);
             }
         }
 
@@ -165,6 +165,8 @@ namespace FactorySystem
 
             // 清理网格占用
             ClearGridOccupancy(machine);
+
+            machine.OnDestroy();
 
             // 销毁游戏对象
             if (machine.gameObject != null)

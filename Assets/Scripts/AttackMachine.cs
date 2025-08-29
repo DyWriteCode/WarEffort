@@ -24,9 +24,9 @@
 //        {
 //            // 添加控制器组件
 //            var controller = gameObject.AddComponent<AttackMachineController>();
-//            controller.damageRange = info.damageRange;
-//            controller.damageInterval = info.damageInterval;
-//            controller.damagePerTick = info.damagePerTick;
+//            controller.damageRange = Info.damageRange;
+//            controller.damageInterval = Info.damageInterval;
+//            controller.damagePerTick = Info.damagePerTick;
 //            controller.Initialize(this);
 //        }
 
@@ -102,6 +102,7 @@
 //}
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -113,23 +114,33 @@ namespace FactorySystem.Machines
     /// </summary>
     public class AttackMachine : Machine
     {
-        // 影响范围半径
-        public float damageRange = 20f;
-        // 伤害间隔（单位：游戏刻）
-        public int damageInterval = 10;
-        // 每次伤害值
-        public int damagePerTick = 10;
-
-        private int currentTick = 0;
-
         public AttackMachine(GameObject gameObject) : base(gameObject, Type.AttackMachine, gameObject.transform.position)
         {
             // 添加控制器组件并初始化
             var controller = gameObject.AddComponent<AttackMachineController>();
-            controller.damageRange = info.damageRange;
-            controller.damageInterval = info.damageInterval;
-            controller.damagePerTick = info.damagePerTick;
+            controller.damageRange = Info.damageRange;
+            controller.damageInterval = Info.damageInterval;
+            controller.damagePerTick = Info.damagePerTick;
             controller.Initialize(this);
+            // 注册伤害任务
+            RegisterDamageTask();
+        }
+
+        private void RegisterDamageTask()
+        {
+            // 使用TimerManager注册伤害任务
+            string taskId = $"{position}_Damage";
+            List<Action> callbacks = new List<Action>();
+            callbacks.Add(ApplyDamageToItemsInRange);
+            callbacks.Add(ApplyDamageToItemsInRange);
+            GameApp.TimerManager.RegisterTask(
+                taskId: taskId,
+                callback: callbacks,
+                interval: Info.damageInterval,
+                unit: TimeUnit.Ticks,
+                isLoop: true,
+                owner: this
+            );
         }
 
         public override bool ShouldExecute()
@@ -140,13 +151,15 @@ namespace FactorySystem.Machines
         public override void Run()
         {
             base.Run(); // 调用基类方法
-            currentTick++;
-            if (currentTick < damageInterval) return;
-            currentTick = 0; // 重置计数器
-            // 根据伤害范围计算额外污染
-            float areaPollution = damageRange * 0.1f;
-            GameApp.PollutionManager.AddPollution(areaPollution);
-            ApplyDamageToItemsInRange();
+        }
+
+        /// <summary>
+        /// 范围内应用污染
+        /// </summary>
+        private void ApplyPollutionToItemsInRange()
+        {
+            float areaPollution = Info.damageRange * 0.1f;
+            GameApp.PollutionManager.AddPollution(areaPollution * Info.pollutionFactor);
         }
 
         /// <summary>
@@ -169,10 +182,10 @@ namespace FactorySystem.Machines
                 // 计算物品与建筑的距离（使用世界坐标）
                 float distance = Vector3.Distance(attackPosition, itemWorldPosition);
 
-                if (distance <= damageRange)
+                if (distance <= Info.damageRange)
                 {
                     // 应用伤害
-                    item.Hp -= damagePerTick;
+                    item.Hp -= Info.damagePerTick;
 
                     if (item.Hp <= 0)
                     {

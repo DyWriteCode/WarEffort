@@ -16,12 +16,14 @@ public class InfoPanel : MonoBehaviour
 
     private bool updaterStarted = false;
 
-    private void Awake() {
+    private void Awake() 
+    {
         Instance = this;
     }
 
     void Update()
     {
+        updateShownInfo();
         if (Input.GetMouseButtonDown(0) && !UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
         {
             trySelectMachine();
@@ -51,7 +53,7 @@ public class InfoPanel : MonoBehaviour
                 updaterStarted = true;
                 InvokeRepeating(nameof(updateShownInfo), 0, 1);
             }
-            setSelectedMachine(selectedMachine.info);
+            setSelectedMachine(selectedMachine.Info);
         }
     }
 
@@ -63,7 +65,19 @@ public class InfoPanel : MonoBehaviour
 
         if (machineInfo.executionType == Machine.ExecutionType.Converter) 
         {
-            description.text += " | Produces ";
+            description.text += " | Converter ";
+        }
+        else if (machineInfo.executionType == Machine.ExecutionType.Building)
+        {
+            description.text += " | Building ";
+        }
+        else if (machineInfo.executionType == Machine.ExecutionType.Generator)
+        {
+            description.text += " | Generator ";
+        }
+        else if (machineInfo.executionType == Machine.ExecutionType.Seller)
+        {
+            description.text += " | Seller ";
         }
     }
 

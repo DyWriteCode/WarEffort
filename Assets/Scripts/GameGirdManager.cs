@@ -68,7 +68,7 @@
 //            while (itemsToCreate.Any()) {
 //                System.Guid id = itemsToCreate.Dequeue();
 //                Item item = items[id];
-//                GameObject obj = Instantiate(item.info.prefab, item.position, Quaternion.Euler(-90, 0, 0), getMachineAt(item.parent).gameObject.transform);
+//                GameObject obj = Instantiate(item.Info.prefab, item.position, Quaternion.Euler(-90, 0, 0), getMachineAt(item.parent).gameObject.transform);
 //                item.transform = obj.transform;
 
 //                // 创建血条
@@ -217,7 +217,7 @@
 //        }
 
 //        public void place (Machine item) {
-//            if (!isAvailable(item.position) || item.info.price > money) {
+//            if (!isAvailable(item.position) || item.Info.price > money) {
 //                return;
 //            }
 //            machines.Add(item.position, item);
@@ -225,7 +225,7 @@
 //            foreach (Vector3 pos in getMachineBlocks(item.position, item.type)) {
 //                grid.Add(pos, item.position);
 //            }
-//            money -= item.info.price;
+//            money -= item.Info.price;
 //        }
 
 //        public Vector3[] getMachineBlocks (Vector3 gridPosition, Machine.Type type) {
@@ -381,9 +381,6 @@ namespace FactorySystem
         [SerializeField] private int gridSize = 1;
         [SerializeField] private Material beltMaterial;
         [SerializeField] private float beltMoveSpeed = 1f;
-
-        // health manager
-        // public GameObject healthBarPrefab;
         #endregion
 
         #region Runtime Data
@@ -405,14 +402,6 @@ namespace FactorySystem
         {
             this.parentObject = parentObject;
             this.beltMaterial = beltMaterial;
-            // ecomoney manager
-            // money = InitialMoney;
-
-            // health manager
-            // InitializeHealthBarManager();
-
-            // machine manager
-            // ProcessMachineInfo();
         }      
         #endregion
 
@@ -448,30 +437,6 @@ namespace FactorySystem
         #endregion
 
         #region Grid Operations
-        /// <summary>
-        /// 获取网格上最近的点
-        /// </summary>
-        //public Vector3 GetNearestPointOnGrid(Vector3 position)
-        //{
-        //    if (parentObject == null)
-        //    {
-        //        Debug.LogError("no parentObject");
-        //        return new Vector3();
-        //    };
-        //    position.y = 0.3f;
-        //    position -= parentObject.transform.position;
-
-        //    int xCount = Mathf.RoundToInt(position.x / gridSize);
-        //    int zCount = Mathf.RoundToInt(position.z / gridSize);
-
-        //    Vector3 result = new Vector3(
-        //        xCount * gridSize,
-        //        0,
-        //        zCount * gridSize);
-
-        //    return result + parentObject.transform.position;
-        //}
-
         public Vector3 GetNearestPointOnGrid(Vector3 position)
         {
             if (parentObject == null)
@@ -500,100 +465,7 @@ namespace FactorySystem
         }
         #endregion
 
-        #region Data Access
-
-        // item manager
-        /// <summary>
-        /// 获取物品信息
-        /// </summary>
-        //public ItemInfo GetItemInfo(Item.Type type)
-        //{
-        //    foreach (ItemInfo itemInfo in ItemsInfo)
-        //    {
-        //        if (itemInfo.type == type)
-        //        {
-        //            return itemInfo;
-        //        }
-        //    }
-        //    throw new System.Exception($"未找到物品类型: {type}");
-        //}
-
-        // pollution manager
-        ///// <summary>
-        ///// 增加全局污染度
-        ///// </summary>
-        //public void AddPollution(float amount)
-        //{
-        //    globalPollution = Mathf.Min(maxPollution, globalPollution + amount);
-        //    OnPollutionChanged?.Invoke(globalPollution);
-
-        //    if (globalPollution >= pollutionWarningThreshold)
-        //    {
-        //        Debug.LogWarning($"污染度警告: {globalPollution}/{maxPollution}");
-        //    }
-        //}
-
-        ///// <summary>
-        ///// 减少全局污染度
-        ///// </summary>
-        //public void ReducePollution(float amount)
-        //{
-        //    globalPollution = Mathf.Max(0, globalPollution - amount);
-        //    OnPollutionChanged?.Invoke(globalPollution);
-        //}
-
-        ///// <summary>
-        ///// 获取当前污染度百分比
-        ///// </summary>
-        //public float GetPollutionPercentage()
-        //{
-        //    return globalPollution / maxPollution;
-        //}
-        #endregion
-
         #region Utility Methodss
-        // item manager
-        ///// <summary>
-        ///// 从队列中安全移除物品
-        ///// </summary>
-        //public void SafeRemoveItemFromQueues(System.Guid itemId)
-        //{
-        //    // 从创建队列中移除
-        //    itemsToCreate = new Queue<System.Guid>(itemsToCreate.Where(id => id != itemId));
-
-        //    // 从移动队列中移除
-        //    itemsToMove = new Queue<System.Guid>(itemsToMove.Where(id => id != itemId));
-        //}
-
-        ///// <summary>
-        ///// 安全销毁物品
-        ///// </summary>
-        //public void SafeDestroyItem(System.Guid itemId)
-        //{
-        //    if (!items.TryGetValue(itemId, out Item item)) return;
-
-        //    // 销毁游戏对象
-        //    if (item.transform != null)
-        //    {
-        //        Destroy(item.transform.gameObject);
-        //    }
-
-        //    foreach (var machine in machines.Values)
-        //    {
-        //        if (machine is FactorySystem.Machines.Belt belt)
-        //        {
-        //            belt.RemoveItemFromBelt(itemId);
-        //        }
-        //    }
-
-        //    // 销毁血条
-        //    item.DestroyHealthBar();
-        //    item.Destroy();
-
-        //    // 从全局系统移除
-        //    items.Remove(itemId);
-        //    SafeRemoveItemFromQueues(itemId);
-        //}
         #endregion
 
         #region Debug and UI

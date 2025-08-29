@@ -1,11 +1,11 @@
 using UnityEngine;
 using System;
 
-public class ConditionalHideAttribute : PropertyAttribute
+public class BoolConditionalHideAttribute : PropertyAttribute
 {
     public string ConditionalSourceField;
 
-    public ConditionalHideAttribute(string conditionalSourceField)
+    public BoolConditionalHideAttribute(string conditionalSourceField)
     {
         ConditionalSourceField = conditionalSourceField;
     }

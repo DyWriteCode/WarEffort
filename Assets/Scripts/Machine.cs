@@ -37,7 +37,7 @@
 //        Input = 1,
 //    }
 
-//    public MachineInfo info {
+//    public MachineInfo Info {
 //        get {
 //            return GameGirdManager.Instance.GetMachineInfo(type);
 //        }
@@ -157,7 +157,7 @@
 //                }
 //                break;
 //            case ExecutionType.Seller:
-//                GameGirdManager.Instance.money += info.moneyThatGenerates;
+//                GameGirdManager.Instance.money += Info.moneyThatGenerates;
 //                foreach (var conn in connections.Where(c => c.Value == ConnectionType.Input))
 //                {
 //                    Machine inputMachine = GameGirdManager.Instance.GetMachineAt(conn.Key);
@@ -301,7 +301,7 @@
 
 //    public bool canStoreItem (Item.Type type, int quantity = 1) {
 //        int currentQuantity = storedItems.ContainsKey(type) ? storedItems[type] : 0;
-//        if ((currentQuantity + quantity) > info.storageLimits[type]) {
+//        if ((currentQuantity + quantity) > Info.storageLimits[type]) {
 //            return false;
 //        }
 //        return true;
@@ -353,12 +353,12 @@ public class Machine
     [System.Serializable]
     public enum Type
     {
-        Belt = 1,
-        IronOreBroker = 2,
-        IronFoundry = 3,
-        IronSeller = 4,
-        AttackMachine = 5,
-        CleanerMachine = 6,
+        Belt = 0,
+        IronOreBroker = 1,
+        IronFoundry = 2,
+        IronSeller = 3,
+        AttackMachine = 4,
+        CleanerMachine = 5,
     }
 
     /// <summary>
@@ -366,10 +366,10 @@ public class Machine
     /// </summary>
     public enum ExecutionType
     {
-        Generator = 1,
-        Converter = 2,
-        Seller = 3,
-        Building = 4,
+        Generator = 0,
+        Converter = 1,
+        Seller = 2,
+        Building = 3,
     }
 
     /// <summary>
@@ -401,10 +401,12 @@ public class Machine
     /// <summary>距离下次执行的剩余时间单位</summary>
     public int ticksUntilNextExecution = 0;
 
+    private float _coherentActionInterval = 10f;
+
     /// <summary>
     /// 获取机器信息
     /// </summary>
-    public MachineInfo info => GameApp.MachineManager.GetMachineInfo(type);
+    public MachineInfo Info => GameApp.MachineManager.GetMachineInfo(type);
     #endregion
 
     #region Constructor
@@ -413,6 +415,23 @@ public class Machine
         this.gameObject = gameObject;
         this.type = type;
         this.position = position;
+        RegisterCoherentTask();
+    }
+
+    public void RegisterCoherentTask()
+    {
+        // 使用TimerManager注册伤害任务
+        string taskId = $"{position}_Coherent";
+        List<Action> callbacks = new List<Action>();
+        callbacks.Add(ExecuteCoherentAction);
+        GameApp.TimerManager.RegisterTask(
+            taskId: taskId,
+            callback: callbacks,
+            interval: _coherentActionInterval,
+            unit: TimeUnit.Ticks,
+            isLoop: true,
+            owner: this
+        );
     }
     #endregion
 
@@ -422,7 +441,10 @@ public class Machine
     /// </summary>
     public void AddConnection(Vector3 neighbor, ConnectionType connectionType)
     {
-        if (connections.ContainsKey(neighbor)) return;
+        if (connections.ContainsKey(neighbor)) 
+        {
+            return;
+        };
 
         connections.Add(neighbor, connectionType);
         OnConnectionUpdated(neighbor);
@@ -456,28 +478,31 @@ public class Machine
     public virtual void Run()
     {
         // 更新执行计时器
-        if (--ticksUntilNextExecution > 0) return;
+        if (--ticksUntilNextExecution > 0)
+        {
+            return;
+        };
 
         // 重置计时器
-        ticksUntilNextExecution = info.ticksBetweenExecution;
+        ticksUntilNextExecution = Info.ticksBetweenExecution;
 
         // 非销售机尝试发送物品到传送带
-        if (info.executionType != ExecutionType.Seller)
+        if (Info.executionType != ExecutionType.Seller)
         {
             SendItemsToConveyorBelt();
         }
 
         // 检查生产条件
-        if (!CanProduce()) return;
+        if (!CanProduce())
+        {
+            return;
+        };
 
         // 消耗原料
         ConsumeInputItems();
 
         // 执行生产逻辑
         ProduceOutputItems();
-
-        float pollutionAmount = info.pollutionPerRun * info.pollutionFactor;
-        GameApp.PollutionManager.AddPollution(pollutionAmount);
     }
 
     /// <summary>
@@ -486,10 +511,13 @@ public class Machine
     private bool CanProduce()
     {
         // 检查是否有足够原料
-        if (!HasRequiredInputItems()) return false;
+        if (!HasRequiredInputItems())
+        {
+            return false;
+        };
 
         // 检查是否有空间存储产品（销售机除外）
-        return info.executionType == ExecutionType.Seller || CanStoreOutputItems();
+        return Info.executionType == ExecutionType.Seller || CanStoreOutputItems();
     }
 
     /// <summary>
@@ -497,7 +525,7 @@ public class Machine
     /// </summary>
     private void ConsumeInputItems()
     {
-        foreach (ItemUI requirement in info.requiredItemsToProduce)
+        foreach (ItemUI requirement in Info.requiredItemsToProduce)
         {
             // 减少库存
             storedItems[requirement.type] -= requirement.quantity;
@@ -512,17 +540,35 @@ public class Machine
     /// </summary>
     private void ProduceOutputItems()
     {
-        switch (info.executionType)
+        switch (Info.executionType)
         {
             case ExecutionType.Converter:
             case ExecutionType.Generator:
-                AddItemsToStorage(info.itemsThatProduces);
+                AddItemsToStorage(Info.itemsThatProduces);
                 break;
 
             case ExecutionType.Seller:
                 ExecuteSellingProcess();
                 break;
         }
+    }
+
+    /// <summary>
+    /// 设置连贯行为的执行间隔（秒）
+    /// </summary>
+    public void SetCoherentActionInterval(float interval)
+    {
+        _coherentActionInterval = Mathf.Max(0.1f, interval);
+    }
+
+    /// <summary>
+    /// 子类可重写此方法以实现自定义的连贯行为
+    /// </summary>
+    protected virtual void ExecuteCoherentAction()
+    {
+        float pollutionAmount = Info.pollutionPerRun ;
+        GameApp.PollutionManager.AddPollution(pollutionAmount);
+        // 默认空实现，子类可重写
     }
     #endregion
 
@@ -532,7 +578,7 @@ public class Machine
     /// </summary>
     private bool HasRequiredInputItems()
     {
-        foreach (ItemUI requirement in info.requiredItemsToProduce)
+        foreach (ItemUI requirement in Info.requiredItemsToProduce)
         {
             if (!storedItems.ContainsKey(requirement.type) ||
                 storedItems[requirement.type] < requirement.quantity)
@@ -548,7 +594,7 @@ public class Machine
     /// </summary>
     private bool CanStoreOutputItems()
     {
-        foreach (ItemUI product in info.itemsThatProduces)
+        foreach (ItemUI product in Info.itemsThatProduces)
         {
             if (!CanStoreItem(product.type, product.quantity))
             {
@@ -579,7 +625,7 @@ public class Machine
     private void ExecuteSellingProcess()
     {
         // 增加资金
-        GameApp.EcomoneyManager.AddMoney(info.moneyThatGenerates);
+        GameApp.EcomoneyManager.AddMoney(Info.moneyThatGenerates);
 
         // 销毁输入传送带上的物品
         foreach (var conn in connections.Where(c => c.Value == ConnectionType.Input))
@@ -614,7 +660,10 @@ public class Machine
     {
         // 查找匹配类型的物品
         var matchingItem = belt.items.FirstOrDefault(x => x.Value == itemType);
-        if (matchingItem.Key == default) return;
+        if (matchingItem.Key == default)
+        {
+            return;
+        };
 
         System.Guid itemId = matchingItem.Key;
 
@@ -643,7 +692,10 @@ public class Machine
     /// </summary>
     private void DestroyLastItemOnBelt(Belt belt)
     {
-        if (!belt.itemPositions.TryGetValue(4, out Guid itemId)) return;
+        if (!belt.itemPositions.TryGetValue(4, out Guid itemId))
+        {
+            return;
+        };
 
         if (GameApp.ItemManager.Items.TryGetValue(itemId, out Item item))
         {
@@ -662,11 +714,17 @@ public class Machine
     private void SendItemsToConveyorBelt()
     {
         // 检查是否有可发送的物品
-        if (!HasItemsToSend()) return;
+        if (!HasItemsToSend())
+        {
+            return;
+        };
 
         // 检查是否有有效的输出连接
         var validOutputs = GetValidOutputConnections();
-        if (validOutputs.Count == 0) return;
+        if (validOutputs.Count == 0)
+        {
+            return;
+        };
 
         // 发送物品到输出连接
         SendItemToOutput(validOutputs.First().Key);
@@ -677,7 +735,7 @@ public class Machine
     /// </summary>
     private bool HasItemsToSend()
     {
-        foreach (ItemUI product in info.itemsThatProduces)
+        foreach (ItemUI product in Info.itemsThatProduces)
         {
             if (storedItems.ContainsKey(product.type) && storedItems[product.type] > 0)
             {
@@ -706,7 +764,7 @@ public class Machine
     private void SendItemToOutput(Vector3 outputPosition)
     {
         Belt outputBelt = (Belt)GameApp.MachineManager.GetMachineAt(outputPosition);
-        Item.Type itemType = info.itemsThatProduces.First().type;
+        Item.Type itemType = Info.itemsThatProduces.First().type;
 
         // 减少库存并添加到传送带
         storedItems[itemType]--;
@@ -765,13 +823,19 @@ public class Machine
         int currentQuantity = storedItems.TryGetValue(type, out int count) ? count : 0;
 
         // 检查存储限制
-        return info.storageLimits.TryGetValue(type, out int limit) &&
+        return Info.storageLimits.TryGetValue(type, out int limit) &&
                (currentQuantity + quantity) <= limit;
     }
 
     public virtual bool ShouldExecute()
     {
         return true; // 默认所有机器都应执行
+    }
+
+    public virtual void OnDestroy()
+    {
+        // 移除所有相关的定时任务
+        GameApp.TimerManager.RemoveTasksByOwner(this);
     }
     #endregion
 }

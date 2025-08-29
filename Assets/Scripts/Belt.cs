@@ -105,7 +105,7 @@
 //                    else
 //                    {
 //                        // check if item can be stored in that machine
-//                        if (!neighborMachine.info.storageLimits.ContainsKey(itemType) || !neighborMachine.canStoreItem(itemType))
+//                        if (!neighborMachine.Info.storageLimits.ContainsKey(itemType) || !neighborMachine.canStoreItem(itemType))
 //                        {
 //                            continue;
 //                        }
@@ -280,7 +280,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace FactorySystem.Machines
 {
@@ -407,6 +406,7 @@ namespace FactorySystem.Machines
         /// </summary>
         public override void Run()
         {
+            base.Run(); // 调用基类方法
             // 处理出口位置的物品（槽位4）
             ProcessExitPositionItem();
 
@@ -511,7 +511,7 @@ namespace FactorySystem.Machines
         private bool TryTransferToMachine(Machine machine, Item.Type itemType)
         {
             // 检查机器是否能存储该物品
-            if (!machine.info.storageLimits.ContainsKey(itemType) ||
+            if (!machine.Info.storageLimits.ContainsKey(itemType) ||
                 !machine.CanStoreItem(itemType))
             {
                 return false;

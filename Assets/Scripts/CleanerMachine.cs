@@ -1,4 +1,7 @@
+using System.Linq;
+using System;
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace FactorySystem.Machines
 {
@@ -6,30 +9,35 @@ namespace FactorySystem.Machines
     /// 清洁机器，定期减少全局污染度
     /// </summary>
     public class CleanerMachine : Machine
-    {
-        // 清洁间隔（单位：游戏刻）
-        public int cleanInterval = 20;
-        // 每次清洁减少的污染值
-        public float pollutionReduction = 10f;
-
-        private int currentTick = 0;
-
+    { 
         public CleanerMachine(GameObject gameObject) : base(gameObject, Type.CleanerMachine, gameObject.transform.position)
         {
             // 添加可视化组件
             var visualizer = gameObject.AddComponent<CleanerMachineVisualizer>();
             visualizer.Initialize(this);
+            // 注册清洁任务
+            RegisterCleaningTask();
+        }
+
+        private void RegisterCleaningTask()
+        {
+            // 使用TimerManager注册清洁任务
+            string taskId = $"{position}_Cleaning";
+            List<Action> callbacks = new List<Action>();
+            callbacks.Add(CleanPollution);
+            GameApp.TimerManager.RegisterTask(
+                taskId: taskId,
+                callback: callbacks,
+                interval: Info.cleanInterval,
+                unit: TimeUnit.Ticks,
+                isLoop: true,
+                owner: this
+            );
         }
 
         public override void Run()
         {
             base.Run();
-
-            currentTick++;
-            if (currentTick < cleanInterval) return;
-            currentTick = 0;
-
-            CleanPollution();
         }
 
         /// <summary>
@@ -37,13 +45,13 @@ namespace FactorySystem.Machines
         /// </summary>
         private void CleanPollution()
         {
-            GameApp.PollutionManager.ReducePollution(pollutionReduction);
+            GameApp.PollutionManager.ReducePollution(Info.pollutionReduction);
 
             // 添加清洁特效
             if (gameObject != null)
             {
                 // 实际项目中可以添加粒子系统
-                Debug.Log($"{gameObject.name} 清洁污染，减少 {pollutionReduction} 点污染");
+                // Debug.Log($"{gameObject.name} 清洁污染，减少 {Info.pollutionReduction} 点污染");
             }
         }
     }

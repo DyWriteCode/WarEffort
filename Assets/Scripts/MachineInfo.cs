@@ -80,6 +80,7 @@ public class MachineInfo
     /// </summary>
     [Header("销售设置")]
     [Tooltip("每次销售获得的金钱")]
+    [EnumConditionalHide(nameof(executionType), Machine.ExecutionType.Seller)]
     public int moneyThatGenerates = 0;
     #endregion
 
@@ -126,18 +127,21 @@ public class MachineInfo
     /// </summary>
     [Header("攻击机器设置")]
     [Tooltip("伤害影响范围半径")]
+    [EnumConditionalHide(nameof(type), Machine.Type.AttackMachine)]
     public float damageRange = 5f;
 
     /// <summary>
     /// 攻击机器专用：伤害间隔
     /// </summary>
     [Tooltip("伤害间隔（游戏刻）")]
+    [EnumConditionalHide(nameof(type), Machine.Type.AttackMachine)]
     public int damageInterval = 10;
 
     /// <summary>
     /// 攻击机器专用：每次伤害值
     /// </summary>
     [Tooltip("每次造成的伤害值")]
+    [EnumConditionalHide(nameof(type), Machine.Type.AttackMachine)]
     public int damagePerTick = 10;
 
     /// <summary>
@@ -145,11 +149,13 @@ public class MachineInfo
     /// </summary>
     [Header("清洁机器设置")]
     [Tooltip("清洁间隔（游戏刻）")]
+    [EnumConditionalHide(nameof(type), Machine.Type.CleanerMachine)]
     public int cleanInterval = 20;
 
     /// <summary>
     /// 清洁机器专用：每次清洁量
     /// </summary>
+    [EnumConditionalHide(nameof(type), Machine.Type.CleanerMachine)]
     [Tooltip("每次减少的污染值")]
     public float pollutionReduction = 50f;
     #endregion

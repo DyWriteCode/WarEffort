@@ -259,7 +259,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2b9a22da079ccb4991e59f9ae933ec5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  type: 3
+  type: 2
 --- !u!1 &179492639
 GameObject:
   m_ObjectHideFlags: 0
@@ -475,7 +475,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2b9a22da079ccb4991e59f9ae933ec5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  type: 1
+  type: 0
 --- !u!1 &289531557
 GameObject:
   m_ObjectHideFlags: 0
@@ -607,7 +607,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2b9a22da079ccb4991e59f9ae933ec5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  type: 6
+  type: 5
 --- !u!114 &318685410
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -703,7 +703,7 @@ GameObject:
   - component: {fileID: 346440322}
   - component: {fileID: 346440321}
   m_Layer: 5
-  m_Name: Button
+  m_Name: UpdateData
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1038,7 +1038,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2b9a22da079ccb4991e59f9ae933ec5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  type: 5
+  type: 4
 --- !u!1 &503494704
 GameObject:
   m_ObjectHideFlags: 0
@@ -1124,7 +1124,7 @@ GameObject:
   - component: {fileID: 504268382}
   - component: {fileID: 504268381}
   m_Layer: 5
-  m_Name: Button
+  m_Name: Clear
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2140,7 +2140,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2b9a22da079ccb4991e59f9ae933ec5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  type: 2
+  type: 1
 --- !u!1 &1091743851
 GameObject:
   m_ObjectHideFlags: 0
@@ -2782,14 +2782,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c31358661e96e2d49b1523a225a8a3f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  NoUseConfigurationTable: 1
   InitialMoney: 100000
   MouseIcon: {fileID: 2800000, guid: 18fef0dfcaa7c68438088377ca0d5d26, type: 3}
   BeltMaterial: {fileID: 2100000, guid: 96f720de15132c146930cd4919bf26df, type: 2}
   HealthBarPrefab: {fileID: 1877534019383751243, guid: b2b003b99683f1a4a9f120877669f0e0,
     type: 3}
   MachinesInfo:
-  - type: 1
-    executionType: 4
+  - type: 0
+    executionType: 3
     name: Conveyor Belt
     description: Brings items to places
     x: 1
@@ -2811,7 +2812,7 @@ MonoBehaviour:
     damagePerTick: 0
     cleanInterval: 0
     pollutionReduction: 0
-  - type: 2
+  - type: 1
     executionType: 1
     name: Iron Ore Broker
     description: Buys iron ore for you
@@ -2838,94 +2839,109 @@ MonoBehaviour:
     damagePerTick: 0
     cleanInterval: 0
     pollutionReduction: 0
-  - type: 0
-    executionType: 0
-    name: 
-    description: 
-    x: 0
-    y: 0
-    prefab: {fileID: 0}
+  - type: 2
+    executionType: 1
+    name: Iron Ore Foundry
+    description: Produces iron
+    x: 3
+    y: 2
+    prefab: {fileID: 2749926753993246322, guid: 9306ea18a166bfc4b933dc4fb4298b20,
+      type: 3}
     icon: {fileID: 0}
-    price: 0
-    ticksBetweenExecution: 0
+    price: 150
+    ticksBetweenExecution: 10
+    requiredItemsToProduce:
+    - type: 2
+      quantity: 2
+    itemsThatProduces:
+    - type: 3
+      quantity: 1
+    moneyThatGenerates: 0
+    _storageLimits:
+    - type: 3
+      quantity: 20
+    - type: 2
+      quantity: 40
+    pollutionPerRun: 1
+    pollutionFactor: 1
+    pollutionRadius: 5
+    damageRange: 5
+    damageInterval: 10
+    damagePerTick: 10
+    cleanInterval: 20
+    pollutionReduction: 50
+  - type: 3
+    executionType: 2
+    name: Iron Seller
+    description: Sells iron
+    x: 1
+    y: 2
+    prefab: {fileID: 185300999308270910, guid: f37b6979c9ae67d41ba806bebb912851, type: 3}
+    icon: {fileID: 0}
+    price: 100
+    ticksBetweenExecution: 10
+    requiredItemsToProduce:
+    - type: 3
+      quantity: 2
+    itemsThatProduces: []
+    moneyThatGenerates: 5
+    _storageLimits:
+    - type: 3
+      quantity: 40
+    pollutionPerRun: 1
+    pollutionFactor: 1
+    pollutionRadius: 5
+    damageRange: 5
+    damageInterval: 10
+    damagePerTick: 10
+    cleanInterval: 20
+    pollutionReduction: 50
+  - type: 4
+    executionType: 3
+    name: AttackMachine
+    description: Attack iron or ironOre
+    x: 1
+    y: 1
+    prefab: {fileID: 2598630887836853488, guid: 999b5ae108c56704c88918dcf634f1db,
+      type: 3}
+    icon: {fileID: 0}
+    price: 200
+    ticksBetweenExecution: 10
     requiredItemsToProduce: []
     itemsThatProduces: []
-    moneyThatGenerates: 0
+    moneyThatGenerates: 5
     _storageLimits: []
-    pollutionPerRun: 0
-    pollutionFactor: 0
-    pollutionRadius: 0
-    damageRange: 0
-    damageInterval: 0
-    damagePerTick: 0
-    cleanInterval: 0
-    pollutionReduction: 0
-  - type: 0
-    executionType: 0
-    name: 
-    description: 
-    x: 0
-    y: 0
-    prefab: {fileID: 0}
+    pollutionPerRun: 1
+    pollutionFactor: 1
+    pollutionRadius: 5
+    damageRange: 5
+    damageInterval: 1
+    damagePerTick: 10
+    cleanInterval: 20
+    pollutionReduction: 50
+  - type: 5
+    executionType: 3
+    name: CleanerMachine
+    description: Remove pollution
+    x: 1
+    y: 1
+    prefab: {fileID: 2598630887836853488, guid: 185d632a1778fdb47bb7eccbcb1e1be8,
+      type: 3}
     icon: {fileID: 0}
-    price: 0
-    ticksBetweenExecution: 0
+    price: 150
+    ticksBetweenExecution: 10
     requiredItemsToProduce: []
     itemsThatProduces: []
-    moneyThatGenerates: 0
+    moneyThatGenerates: 5
     _storageLimits: []
-    pollutionPerRun: 0
-    pollutionFactor: 0
-    pollutionRadius: 0
-    damageRange: 0
-    damageInterval: 0
-    damagePerTick: 0
-    cleanInterval: 0
-    pollutionReduction: 0
-  - type: 0
-    executionType: 0
-    name: 
-    description: 
-    x: 0
-    y: 0
-    prefab: {fileID: 0}
-    icon: {fileID: 0}
-    price: 0
-    ticksBetweenExecution: 0
-    requiredItemsToProduce: []
-    itemsThatProduces: []
-    moneyThatGenerates: 0
-    _storageLimits: []
-    pollutionPerRun: 0
-    pollutionFactor: 0
-    pollutionRadius: 0
-    damageRange: 0
-    damageInterval: 0
-    damagePerTick: 0
-    cleanInterval: 0
-    pollutionReduction: 0
-  - type: 0
-    executionType: 0
-    name: 
-    description: 
-    x: 0
-    y: 0
-    prefab: {fileID: 0}
-    icon: {fileID: 0}
-    price: 0
-    ticksBetweenExecution: 0
-    requiredItemsToProduce: []
-    itemsThatProduces: []
-    moneyThatGenerates: 0
-    _storageLimits: []
-    pollutionPerRun: 0
-    pollutionFactor: 0
-    pollutionRadius: 0
-    damageRange: 0
-    damageInterval: 0
-    damagePerTick: 0
-    cleanInterval: 0
-    pollutionReduction: 0
+    pollutionPerRun: 1
+    pollutionFactor: 1
+    pollutionRadius: 5
+    damageRange: 5
+    damageInterval: 100
+    damagePerTick: 10
+    cleanInterval: 20
+    pollutionReduction: 50
   ItemsInfo:
   - name: Coal
     description: Coal
@@ -3181,7 +3197,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2b9a22da079ccb4991e59f9ae933ec5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  type: 4
+  type: 3
 --- !u!1 &1851992215
 GameObject:
   m_ObjectHideFlags: 0
@@ -3779,6 +3795,53 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2039305563}
   m_CullTransparentMesh: 0
+--- !u!1 &2062336163
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2062336165}
+  - component: {fileID: 2062336166}
+  m_Layer: 0
+  m_Name: Test
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2062336165
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2062336163}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 25.491394, y: -3.1716955, z: 0.17092328}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2062336166
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2062336163}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a703f0dce8b738a45bc97710c5c8750f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  conditions: []
+  test: 1
+  testint: 0
 --- !u!1 &2082473846
 GameObject:
   m_ObjectHideFlags: 0
@@ -3949,3 +4012,4 @@ SceneRoots:
   - {fileID: 1907757761}
   - {fileID: 862041958}
   - {fileID: 731821824}
+  - {fileID: 2062336165}
