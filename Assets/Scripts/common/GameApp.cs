@@ -23,9 +23,16 @@ public class GameApp : Singleton<GameApp>
     public override void Awake(List<System.Object> objects, List<UnityEngine.Object> gameObjects)
     {
         ConfigManager = new ConfigManager();
-        ConfigManager.LoadGameMainConfigs();
-        // add game config table to the func init
-        Init(objects, gameObjects);
+        if ((bool)objects[0] == true)
+        {
+            ConfigManager.LoadGameMainConfigs();
+            // add game config table to the func init
+        }
+        else
+        {
+            Init(objects.Slice(1), gameObjects);
+        }
+        return;
     }
 
     public override void Init(List<System.Object> normalObjects = null, List<UnityEngine.Object> unityObject = null)

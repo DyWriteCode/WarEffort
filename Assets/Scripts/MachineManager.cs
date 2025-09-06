@@ -49,12 +49,14 @@ namespace FactorySystem
             {
                 // 转换存储限制为字典格式
                 machine.storageLimits = new Dictionary<Item.Type, int>();
-                foreach (ItemUI item in machine._storageLimits)
+                if (machine._storageLimits.Length != 0)
                 {
-                    machine.storageLimits.Add(item.type, item.quantity);
+                    foreach (ItemUI item in machine._storageLimits)
+                    {
+                        machine.storageLimits.Add(item.type, item.quantity);
+                    }
+                    machine._storageLimits = null; // 释放原始数据
                 }
-                machine._storageLimits = null; // 释放原始数据
-
                 // 添加到缓存
                 _machineInfoCache[machine.type] = machine;
             }

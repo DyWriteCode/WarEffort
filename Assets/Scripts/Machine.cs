@@ -515,7 +515,6 @@ public class Machine
         {
             return false;
         };
-
         // 检查是否有空间存储产品（销售机除外）
         return Info.executionType == ExecutionType.Seller || CanStoreOutputItems();
     }
@@ -546,7 +545,6 @@ public class Machine
             case ExecutionType.Generator:
                 AddItemsToStorage(Info.itemsThatProduces);
                 break;
-
             case ExecutionType.Seller:
                 ExecuteSellingProcess();
                 break;
@@ -624,14 +622,23 @@ public class Machine
     /// </summary>
     private void ExecuteSellingProcess()
     {
-        // 增加资金
-        GameApp.EcomoneyManager.AddMoney(Info.moneyThatGenerates);
-
         // 销毁输入传送带上的物品
+        // 增加资金
         foreach (var conn in connections.Where(c => c.Value == ConnectionType.Input))
         {
             if (GameApp.MachineManager.GetMachineAt(conn.Key) is Belt inputBelt)
             {
+                Item resItem = GetLastItemOnBelt(inputBelt);
+                if (resItem != null)
+                {
+                    foreach (var moneyThatGenerates in Info.moneyThatGenerates)
+                    {
+                        if (moneyThatGenerates.type == resItem.type)
+                        {
+                            GameApp.EcomoneyManager.AddMoney(moneyThatGenerates.money);
+                        }
+                    }
+                }
                 DestroyLastItemOnBelt(inputBelt);
             }
         }
@@ -706,6 +713,24 @@ public class Machine
 
         belt.items.Remove(itemId);
         belt.itemPositions.Remove(4);
+    }
+
+    /// <summary>
+    /// 获取传送带上的最后一个物品
+    /// </summary>
+    private Item GetLastItemOnBelt(Belt belt)
+    {
+        Item resItem = null;
+        if (!belt.itemPositions.TryGetValue(4, out Guid itemId))
+        {
+            return resItem;
+        };
+
+        if (GameApp.ItemManager.Items.TryGetValue(itemId, out Item item))
+        {
+            resItem = item;
+        }
+        return resItem;
     }
 
     /// <summary>

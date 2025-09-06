@@ -6,7 +6,7 @@ namespace FactorySystem
 {
     public class GameScene : MonoBehaviour
     {
-        public bool NoUseConfigurationTable = true;
+        public bool NoUseConfigurationTable = false;
 
         [Header("Game Settings")]
         [BoolConditionalHide(nameof(NoUseConfigurationTable))]
@@ -49,6 +49,7 @@ namespace FactorySystem
                 DontDestroyOnLoad(gameObject);
                 GameApp.Instance.Awake(new List<System.Object>() 
                 {
+                    !NoUseConfigurationTable,
                     this.MachinesInfo,
                     this.ItemsInfo,
                     this.InitialMoney,

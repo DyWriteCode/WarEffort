@@ -31,12 +31,14 @@ public class MachineInfo
     /// 机器在X轴占用的网格单位
     /// </summary>
     [Tooltip("X轴占用网格数量")]
+    [Min(1)]
     public int x = 1;
 
     /// <summary>
     /// 机器在Y轴占用的网格单位
     /// </summary>
     [Tooltip("Y轴占用网格数量")]
+    [Min(1)]
     public int y = 1;
 
     /// <summary>
@@ -53,6 +55,7 @@ public class MachineInfo
     /// 机器价格
     /// </summary>
     [Tooltip("建造所需金钱")]
+    [Min(0)]
     public int price = 100;
     #endregion
 
@@ -61,6 +64,7 @@ public class MachineInfo
     /// 每次生产周期需要的游戏刻
     /// </summary>
     [Tooltip("生产间隔（游戏刻）")]
+    [Min(0)]
     public int ticksBetweenExecution = 10;
 
     /// <summary>
@@ -80,8 +84,8 @@ public class MachineInfo
     /// </summary>
     [Header("销售设置")]
     [Tooltip("每次销售获得的金钱")]
-    [EnumConditionalHide(nameof(executionType), Machine.ExecutionType.Seller)]
-    public int moneyThatGenerates = 0;
+    // [EnumConditionalHide(nameof(executionType), Machine.ExecutionType.Seller)]
+    public SellerItem[] moneyThatGenerates;
     #endregion
 
     #region Storage Settings
@@ -195,4 +199,24 @@ public class ItemUI
     [Tooltip("数量")]
     [Min(1)]
     public int quantity = 1;
+}
+
+/// <summary>
+/// 售卖物品关联结构（用于编辑器可视化）
+/// </summary>
+[Serializable]
+public class SellerItem
+{
+    /// <summary>
+    /// 物品类型
+    /// </summary>
+    [Tooltip("物品类型")]
+    public Item.Type type;
+
+    /// <summary>
+    /// 物品数量
+    /// </summary>
+    [Tooltip("所卖的钱")]
+    [Min(0)]
+    public int money = 0;
 }

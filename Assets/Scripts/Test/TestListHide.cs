@@ -5,8 +5,9 @@ using UnityEngine;
 
 public class TestListHide : MonoBehaviour
 {
-    public TestCondition[] conditions;
     public bool test = true;
+    [BoolConditionalHide(nameof(test))]
+    public TestCondition[] conditions;
     [BoolConditionalHide(nameof(test))]
     public int testint = 0;
 }
